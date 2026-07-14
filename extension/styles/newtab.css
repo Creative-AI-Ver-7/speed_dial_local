@@ -1,0 +1,260 @@
+.svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+body { min-height: 100vh; overflow-x: hidden; }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-color: var(--background-color);
+  background-image: var(--user-background);
+  background-repeat: var(--background-repeat, no-repeat);
+  background-position: var(--background-position, left top);
+  background-size: var(--background-size, auto);
+  scale: 1;
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,.015), rgba(255,255,255,.015));
+}
+.ambient { display: none; }
+.app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* Original Speed Dial 2 layout: fixed group bar, compact search and settings. */
+.topbar {
+  position: fixed;
+  z-index: 20;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 24px 0 30px;
+  background: color-mix(in srgb, var(--panel) 96%, transparent);
+  border-bottom: 1px solid rgba(0,0,0,.08);
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  backdrop-filter: blur(8px);
+}
+.group-strip { display: flex; align-items: stretch; flex: 1; min-width: 0; height: 56px; }
+.group-tabs { display: flex; align-items: stretch; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.group-tab { position: relative; display: flex; align-items: stretch; flex: 0 0 auto; cursor: grab; }
+.group-tab::before { display: none; }
+.group-tab .group-label {
+  padding: 0 14px;
+  color: var(--ink-soft);
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.group-tab .group-label:hover { color: var(--ink); background: rgba(0,0,0,.025); }
+.group-tab.active .group-label { color: var(--accent); border-bottom-color: var(--accent); }
+.group-tab.drag-over { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.group-tab .group-menu {
+  align-self: center;
+  width: 22px;
+  height: 22px;
+  margin: 0 4px 0 -9px;
+  padding: 0;
+  color: #aaa;
+  background: transparent;
+  border-radius: 50%;
+  opacity: 0;
+}
+.group-tab:hover .group-menu, .group-tab.active .group-menu { opacity: 1; }
+.group-tab .group-menu svg { width: 13px; height: 13px; fill: currentColor; }
+.add-group { align-self: center; flex: 0 0 28px; width: 28px; height: 28px; margin-left: 4px; padding: 0; color: #999; background: transparent; border-radius: 50%; }
+.add-group:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, transparent); }
+.add-group svg { width: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+.search-box {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  width: 150px;
+  height: 34px;
+  margin-left: 14px;
+  padding: 0 11px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  opacity: .72;
+  transition: width .25s, opacity .15s, border-color .15s;
+}
+.search-box:focus-within { width: 210px; opacity: 1; border-color: #bbb; }
+.search-box svg, .drawer-search svg { flex: 0 0 auto; width: 16px; height: 16px; margin-right: 7px; fill: none; stroke: #999; stroke-width: 1.8; }
+.search-box input, .drawer-search input { min-width: 0; flex: 1; padding: 0; color: var(--ink); background: transparent; border: 0; }
+.search-box input::placeholder, .drawer-search input::placeholder { color: #aaa; }
+.search-box kbd { display: none; }
+.top-actions { display: flex; align-items: center; gap: 5px; margin-left: 10px; }
+#open-library, #open-stats, #add-dial, .add-group, .card-menu, .group-menu { display: none !important; }
+.top-actions .icon-button { border: 0; background: transparent; border-radius: 50%; }
+.top-actions .icon-button:hover { color: var(--accent); background: rgba(0,0,0,.045); }
+.add-dial-button { color: var(--accent) !important; }
+.top-actions svg, .primary-button svg, .ghost-button svg, .danger-button svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.9; }
+
+.workspace { box-sizing: border-box; width: 100%; margin: 0 auto; padding: 71px 0 30px; flex: 1; }
+.dial-stage { width: 100%; padding-top: 15px; }
+.vertical-center .workspace { display: flex; align-items: center; padding-top: 56px; }
+.vertical-center .dial-stage { width: 100%; padding-top: 0; }
+.stage-heading { display: none; }
+.stage-heading > div:first-child { display: flex; align-items: baseline; gap: 8px; }
+.eyebrow { margin: 0; color: var(--ink-soft); font-size: 11px; font-weight: 400; }
+.stage-heading h1 { margin: 0; font-size: 13px; font-weight: 500; }
+.stage-tools { display: flex; align-items: center; gap: 10px; }
+.stage-count { margin: 0; color: #999; font-size: 11px; }
+.open-group-button { min-height: 28px; padding: 0 10px; font-size: 11px; background: transparent; }
+.open-group-button svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+
+.dial-grid { display: grid; grid-template-columns: repeat(var(--dial-columns), var(--dial-width, 320px)); gap: var(--dial-gap); align-items: start; justify-content: center; margin: 0 auto; }
+.dial-card { position: relative; width: var(--dial-width, 320px); min-width: 0; animation: card-in .16s both; }
+.dial-card.dragging { z-index: 5; opacity: .7; transform: rotate(2deg); }
+.dial-card.drag-over { outline: 1px dashed #aaa; outline-offset: 6px; }
+.dial-link {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--dial-padding, 4px);
+  padding-bottom: 0;
+  color: var(--ink);
+  text-align: left;
+  background: var(--dial-background, #fff);
+  border: 1px solid var(--dial-border, #ddd);
+  border-radius: var(--card-radius);
+  box-shadow: none;
+  overflow: hidden;
+  transition: border-color .15s, background-color .15s;
+}
+:root[data-shadow="box"] .dial-link { box-shadow: 0 0 4px rgba(0,0,0,.28); }
+:root[data-shadow="drop"] .dial-link { box-shadow: 0 5px 5px -3px rgba(0,0,0,.42); }
+:root[data-shadow="glow"] .dial-link { box-shadow: 0 0 15px rgba(0,0,0,.24); }
+.dial-link:hover { background: var(--dial-background-hover, #fff); border-color: var(--dial-border-hover, #ccc); }
+.dial-card.frequent .dial-link { border-color: color-mix(in srgb, var(--accent) 42%, var(--line)); }
+.dial-visual { position: relative; display: block; width: 100%; height: var(--dial-thumb-height, 190px); overflow: hidden; background: #fff; border-bottom: 1px solid var(--dial-border, #ddd); }
+.dial-visual::after { display: none; }
+.dial-image { width: 100%; height: 100%; object-fit: var(--thumbnail-fit, contain); object-position: top center; }
+.default-thumb { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(145deg, hsl(var(--site-hue) 28% 96%), hsl(calc(var(--site-hue) + 25) 24% 90%)); }
+:root[data-theme="dark"] .default-thumb { background: linear-gradient(145deg, hsl(var(--site-hue) 12% 25%), hsl(calc(var(--site-hue) + 25) 12% 18%)); }
+.default-thumb::before { display: none; }
+.site-monogram { display: grid; place-items: center; width: 58px; height: 58px; color: #777; font-size: 20px; background: rgba(255,255,255,.75); border: 1px solid rgba(0,0,0,.12); border-radius: 4px; }
+.site-monogram img { width: 32px; height: 32px; object-fit: contain; }
+.dial-index { display: none; }
+.card-menu { position: absolute; z-index: 4; top: 6px; right: 6px; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; color: #555; background: rgba(255,255,255,.9); border: 1px solid rgba(0,0,0,.12); border-radius: 2px; opacity: 0; }
+.card-menu svg { width: 13px; height: 13px; fill: currentColor; }
+.dial-card:hover .card-menu { opacity: 1; }
+.dial-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 27px; padding: 3px 7px 2px; }
+.dial-title { min-width: 0; flex: 1; }
+.dial-title strong { display: block; overflow: hidden; color: var(--title-color, #8c7e7e); font-family: var(--dial-font-family); font-size: var(--dial-font-size, 11px); font-style: var(--dial-font-style); font-weight: var(--dial-font-weight); text-align: var(--title-align, center); text-overflow: ellipsis; white-space: nowrap; }
+.dial-link:hover .dial-title strong { color: var(--title-color-hover, #333); }
+.dial-title small { display: none; }
+.visit-count { flex: 0 0 auto; color: #aaa; font-size: 10px; }
+.hide-titles .dial-meta { display: none; }
+.hide-visits .visit-count { display: none; }
+.add-dial-tile {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  width: var(--dial-width, 320px);
+  height: calc(var(--dial-thumb-height, 190px) + 28px);
+  color: #aaa;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  opacity: .7;
+}
+.add-dial-tile:hover { opacity: 1; }
+.add-dial-tile img { width: 64px; height: 64px; }
+
+.empty-state { width: 240px; margin: 13vh auto 0; text-align: center; }
+.empty-orbit { display: none; }
+.first-dial-button { display: block; width: 200px; min-height: 164px; margin: 0 auto; padding: 132px 0 0; color: #222; font-size: 18px; font-weight: 100; text-align: center; background: url(../images/newtab.first-dial.png) top center / 112px auto no-repeat; }
+.first-dial-button:hover { color: #4285f4; }
+.empty-state > .text-button { margin-top: 12px; color: #999; font-size: 11px; }
+.page-footer { display: none; }
+.text-button { padding: 0; color: #999; background: transparent; }
+.text-button:hover { color: var(--accent); }
+
+#sidebar-toggle { position: fixed; z-index: 29; top: 20%; right: 0; width: 4%; height: 70%; background: transparent; }
+.sidebar-arrow { position: fixed; top: 50%; right: 1%; width: 20px; height: 32px; margin-top: -16px; background: url(../images/newtab.sidebar.arrow.png) center / contain no-repeat; pointer-events: none; }
+#sidebars { position: fixed; z-index: 30; top: 0; right: 0; display: flex; height: 100vh; overflow: hidden; color: #000; background: #fff; transition: right 175ms ease; }
+.sidebar-panel { box-sizing: border-box; width: 281px; height: 100%; overflow: auto; border-left: 1px solid #ccc; background: #fff; }
+.sidebar-panel h1 { margin: 0; padding: 20px 20px 4px; color: #222; font-size: 18px; font-weight: 400; }
+.sidebar-search { box-sizing: border-box; width: 240px; margin: 10px 20px 20px; padding: 8px 30px 8px 10px; color: #222; background: #fff url(../images/sidebar.search.svg) 210px 10px no-repeat; border: 1px solid #ddd; border-radius: 2px; }
+.sidebar-panel ul { margin: 0; padding: 0; }
+.sidebar-panel li { margin: 0; overflow: hidden; list-style: none; font-size: 12px; }
+.sidebar-panel li:hover { background: #f7f7f7; }
+.sidebar-panel li > a,
+.sidebar-panel li > button { box-sizing: border-box; display: block; width: 100%; min-height: 42px; padding: 12px 20px 12px 52px; overflow: hidden; color: #333; text-align: left; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; background-color: transparent; background-position: 20px center; background-repeat: no-repeat; background-size: 18px; }
+.sidebar-panel li > a b { font-weight: 600; }
+.bookmark-folder > button { background-image: url(../images/sidebar.folder.svg); }
+.bookmark-back > button { background-image: url(../images/sidebar.back.png); }
+.session-command > button { padding-left: 20px !important; color: #555; }
+.restore-all { background: #faff75; }
+.sidebar-note { padding: 14px 20px; color: #888; }
+
+.context-menu { position: fixed; z-index: 80; min-width: 190px; padding: 5px 0; color: #333; background: #fff; border: 1px solid #bbb; border-radius: 2px; box-shadow: 0 3px 12px rgba(0,0,0,.18); }
+.context-menu button { display: block; width: 100%; padding: 7px 20px; color: #333; text-align: left; background: transparent; }
+.context-menu button:hover:not(:disabled) { background: #4285f4; color: #fff; }
+.context-menu button:disabled { color: #aaa; }
+.context-menu hr { height: 1px; margin: 4px 0; background: #ddd; border: 0; }
+.dialog-spacer { flex: 1; }
+.top-sites-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.top-site-option { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: 2px; }
+.top-site-option img { width: 24px; height: 24px; object-fit: contain; }
+.top-site-option span { min-width: 0; overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.thumbnail-choices { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin: 0; padding: 0; border: 0; }
+.thumbnail-choices legend { margin-bottom: 8px; color: #666; font-size: 12px; font-weight: 600; }
+.thumbnail-choices label { display: flex; align-items: flex-start; gap: 8px; padding: 10px; background: var(--panel-strong); border: 1px solid var(--line); border-radius: 2px; }
+.thumbnail-choices input { margin-top: 2px; }
+.thumbnail-choices span { display: grid; gap: 2px; font-size: 12px; }
+.thumbnail-choices small { color: #999; font-size: 10px; line-height: 1.35; }
+.wide-dialog { width: min(820px, calc(100vw - 32px)); }
+.settings-layout { grid-template-columns: repeat(2,minmax(0,1fr)); align-items: start; }
+.settings-section { display: grid; gap: 13px; padding: 16px; background: var(--panel-strong); border: 1px solid var(--line); border-radius: 2px; }
+.settings-section h3 { margin: 0 0 2px; font-size: 15px; font-weight: 500; }
+.field-row { display: grid; grid-template-columns: 1fr 90px; gap: 10px; }
+.range-field { display: grid; gap: 6px; }
+.range-field > span { display: flex; justify-content: space-between; color: #666; font-size: 11px; }
+:root[data-theme="dark"] .range-field > span { color: var(--ink-soft); }
+.range-field input { width: 100%; }
+.data-tools { grid-column: 1 / -1; }
+.data-tools p { margin: 0; color: #888; line-height: 1.6; }
+.data-tools > div { display: flex; gap: 8px; }
+.file-button { position: relative; cursor: pointer; }
+.file-button input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.compact { justify-self: start; min-height: 30px; }
+.stats-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.stat-tile { padding: 17px; background: var(--panel-strong); border: 1px solid var(--line); border-radius: 2px; }
+.stat-tile strong { display: block; font-size: 30px; font-weight: 300; }
+.stat-tile span { color: #888; font-size: 11px; }
+.period-chart { display: grid; gap: 9px; padding: 17px; border: 1px solid var(--line); border-radius: 2px; }
+.period-row { display: grid; grid-template-columns: 70px 1fr 36px; align-items: center; gap: 10px; color: #888; font-size: 11px; }
+.period-bar { height: 7px; overflow: hidden; background: #e5e5e5; border-radius: 4px; }
+.period-bar i { display: block; height: 100%; background: var(--accent); }
+.top-list { display: grid; gap: 4px; }
+.top-row { display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.top-row > span:first-child { color: var(--accent); }
+.top-row small { color: #999; }
+
+@keyframes card-in { from { opacity: 0; transform: translateY(4px); } }
+@media (max-width: 900px) {
+  .topbar { padding-left: 12px; }
+  .search-box { width: 34px; padding: 0 8px; }
+  .search-box input { width: 0; }
+  .search-box:focus-within { width: 180px; }
+  .search-box:focus-within input { width: auto; }
+  .top-actions #open-stats { display: none; }
+  .workspace { width: 94%; }
+}
+@media (max-width: 620px) {
+  .top-actions #open-library { display: none; }
+  .settings-layout { grid-template-columns: 1fr; }
+  .data-tools { grid-column: auto; }
+  .thumbnail-choices { grid-template-columns: 1fr; }
+  .stage-heading { display: none; }
+  .stats-summary { grid-template-columns: 1fr; }
+}

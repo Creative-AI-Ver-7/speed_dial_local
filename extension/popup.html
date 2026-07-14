@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>添加到快速拨号</title>
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/popup.css">
+</head>
+<body>
+  <main class="popup-shell">
+    <h1><span id="popup-heading">保存页面到</span><button id="open-options" title="设置">设置</button></h1>
+    <ul class="group-list" id="group-list"></ul>
+    <ul class="create-list"><li><button id="show-create-group">＋ 新建分组</button></li></ul>
+    <form id="create-group-form" hidden>
+      <input name="name" required maxlength="48" placeholder="新建分组">
+      <button type="submit">保存</button>
+    </form>
+    <p id="status" role="status"></p>
+  </main>
+  <script type="module" src="js/popup.js"></script>
+</body>
+</html>

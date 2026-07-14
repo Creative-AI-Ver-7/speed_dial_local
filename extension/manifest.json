@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Speed Dial 2",
+  "short_name": "Speed Dial 2",
+  "version": "1.0.0",
+  "description": "Chrome 新标签页快速拨号扩展。",
+  "minimum_chrome_version": "120",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "添加当前网页到快速拨号",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "options_page": "options.html",
+  "permissions": [
+    "activeTab",
+    "contextMenus",
+    "favicon",
+    "storage",
+    "tabs",
+    "unlimitedStorage",
+    "bookmarks",
+    "history",
+    "sessions",
+    "topSites"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ]
+}

@@ -1,0 +1,18 @@
+body { min-height: 100vh; color: #333; background: #f6f6f6; }
+header { display: flex; align-items: center; justify-content: space-between; height: 58px; padding: 0 32px; background: #fff; border-bottom: 1px solid #ddd; }
+header h1 { margin: 0; font-size: 20px; font-weight: 300; }
+header a { color: #777; font-size: 12px; text-decoration: none; }
+main { width: min(900px, calc(100% - 40px)); margin: 32px auto; }
+nav { display: flex; margin-bottom: 18px; border-bottom: 1px solid #ccc; }
+nav button { padding: 10px 16px; color: #777; background: transparent; border-bottom: 2px solid transparent; }
+nav button.active { color: #4285f4; border-bottom-color: #4285f4; }
+section { padding: 24px; background: #fff; border: 1px solid #ddd; }
+section h2 { margin: 0 0 22px; font-size: 17px; font-weight: 400; }
+.stat-row { display: grid; grid-template-columns: 32px minmax(150px, 260px) 1fr 56px; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #eee; }
+.stat-row:last-child { border-bottom: 0; }
+.rank { color: #999; font-size: 11px; }
+.stat-name { min-width: 0; overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.bar { height: 8px; overflow: hidden; background: #eee; border-radius: 4px; }
+.bar i { display: block; height: 100%; background: #4285f4; }
+.value { color: #777; font-size: 11px; text-align: right; }
+.empty { padding: 40px; color: #999; text-align: center; }

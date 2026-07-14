@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Speed Dial 2 设置</title>
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/options.css">
+</head>
+<body>
+  <main class="options-shell" id="main">
+    <header class="options-header"><a class="back-link" href="newtab.html">返回快速拨号</a><h1>设置</h1></header>
+    <nav id="options-navigation">
+      <button class="active" type="button" data-tab="general">常规</button>
+      <button type="button" data-tab="design">背景</button>
+      <button type="button" data-tab="sidebars">侧栏</button>
+      <button type="button" data-tab="dials">自定义</button>
+      <button type="button" data-tab="importexport">备份</button>
+    </nav>
+    <form id="options-form">
+      <section id="general" data-tab-panel="general">
+        <h2>常规</h2>
+        <div class="option-grid">
+          <label><span>列数</span><input name="columns" type="number" min="2" max="20"></label>
+          <label><span>拨号间距</span><input name="gap" type="number" min="0" max="100"></label>
+          <label><span>页面宽度（%）</span><input name="dialSpace" type="number" min="10" max="100"></label>
+          <label><span>排列方式</span><select name="sortMode"><option value="manual">手动排列</option><option value="visits">按访问次数</option></select></label>
+        </div>
+        <div class="switches">
+          <label><input name="verticalCenter" type="checkbox"><span>垂直居中</span></label>
+          <label><input name="darkTheme" type="checkbox"><span>深色主题</span></label>
+          <label><input name="showAddButton" type="checkbox"><span>显示添加按钮</span></label>
+          <label><input name="showSearch" type="checkbox"><span>显示搜索框</span></label>
+          <label><input name="showTitles" type="checkbox"><span>显示网站名称</span></label>
+          <label><input name="showVisits" type="checkbox"><span>显示访问次数</span></label>
+          <label><input name="keepActiveGroup" type="checkbox"><span>记住当前分组</span></label>
+          <label><input name="highlight" type="checkbox"><span>突出显示当前时段常用网站</span></label>
+          <label><input name="alwaysNewTab" type="checkbox"><span>始终在新标签页中打开</span></label>
+          <label><input name="scrollLayout" type="checkbox"><span>使用滚动布局</span></label>
+          <label><input name="showContextMenu" type="checkbox"><span>启用右键菜单</span></label>
+        </div>
+      </section>
+
+      <section id="appearance" data-tab-panel="dials" hidden>
+        <h2>拨号样式</h2>
+        <div class="dial-preview"><div class="preview-card"><div class="preview-image"></div><div class="preview-title">标题</div></div></div>
+        <div class="option-grid">
+          <label><span>圆角</span><input name="cardRadius" type="number" min="0" max="30"></label>
+          <label><span>内边距</span><input name="padding" type="number" min="0" max="30"></label>
+          <label><span>缩略图比例</span><input name="thumbnailRatio" type="number" min="0.5" max="2" step="0.05"></label>
+          <label><span>阴影</span><select name="shadowStyle"><option value="none">无</option><option value="box">方框阴影</option><option value="drop">投影</option><option value="glow">发光</option></select></label>
+          <label><span>标题对齐</span><select name="titleAlign"><option value="left">左对齐</option><option value="center">居中</option><option value="right">右对齐</option></select></label>
+          <label><span>字体</span><select name="fontFamily"><option value="Helvetica, Arial, sans-serif">Helvetica</option><option value="Arial, sans-serif">Arial</option><option value="Georgia, serif">Georgia</option><option value="monospace">等宽字体</option></select></label>
+          <label><span>字号</span><input name="fontSize" type="number" min="8" max="30"></label>
+          <label><span>字体样式</span><select name="fontStyle"><option value="normal">正常</option><option value="italic">斜体</option></select></label>
+          <label><span>字体粗细</span><select name="fontWeight"><option value="normal">正常</option><option value="bold">粗体</option></select></label>
+        </div>
+        <div class="color-grid">
+          <label><span>拨号背景</span><input name="dialBackground" type="color"></label>
+          <label><span>悬停背景</span><input name="dialBackgroundHover" type="color"></label>
+          <label><span>边框</span><input name="dialBorder" type="color"></label>
+          <label><span>悬停边框</span><input name="dialBorderHover" type="color"></label>
+          <label><span>标题</span><input name="titleColor" type="color"></label>
+          <label><span>悬停标题</span><input name="titleColorHover" type="color"></label>
+        </div>
+        <label class="full-field"><span>自定义 CSS</span><textarea name="customCss" rows="7"></textarea></label>
+      </section>
+
+      <section id="thumbnail" data-tab-panel="general">
+        <h2>缩略图</h2>
+        <div class="option-grid">
+          <label><span>自动更新</span><select name="refreshThumbnails"><option value="0">从不</option><option value="2">每 2 次访问</option><option value="5">每 5 次访问</option><option value="10">每 10 次访问</option></select></label>
+          <label><span>截图质量</span><select name="thumbnailQuality"><option value="low">低</option><option value="medium">中</option><option value="high">高</option></select></label>
+          <label><span>图片适配</span><select name="thumbnailFit"><option value="contain">完整显示并居中</option><option value="cover">填满缩略图</option></select></label>
+        </div>
+      </section>
+
+      <section id="background" data-tab-panel="design" hidden>
+        <h2>背景</h2>
+        <div class="option-grid">
+          <label><span>背景颜色</span><input name="backgroundColor" type="color"></label>
+          <label><span>图片网址</span><input name="backgroundUrl" type="url" placeholder="https://…"></label>
+          <label><span>重复方式</span><select name="backgroundRepeat"><option value="no-repeat">不重复</option><option value="repeat">重复</option><option value="repeat-x">横向重复</option><option value="repeat-y">纵向重复</option></select></label>
+          <label><span>图片尺寸</span><select name="backgroundSize"><option value="auto">原始尺寸</option><option value="cover">覆盖页面</option><option value="contain">完整显示</option></select></label>
+          <label><span>图片位置</span><select name="backgroundPosition"><option value="left top">左上</option><option value="center top">中上</option><option value="right top">右上</option><option value="left center">左中</option><option value="center center">居中</option><option value="right center">右中</option><option value="left bottom">左下</option><option value="center bottom">中下</option><option value="right bottom">右下</option></select></label>
+          <label><span>从电脑选择</span><input id="background-file" type="file" accept="image/*"></label>
+        </div>
+        <button type="button" class="secondary" id="clear-background">移除背景图片</button>
+      </section>
+
+      <section id="sidebar" data-tab-panel="sidebars" hidden>
+        <h2>侧栏</h2>
+        <div class="switches">
+          <label><input name="sidebarEnabled" type="checkbox"><span>启用侧栏</span></label>
+          <label><input name="sidebarBookmarks" type="checkbox"><span>显示书签</span></label>
+          <label><input name="sidebarHistory" type="checkbox"><span>显示最近关闭和历史记录</span></label>
+        </div>
+      </section>
+
+      <section id="data" data-tab-panel="importexport" hidden>
+        <h2>导入与导出</h2>
+        <div class="button-row">
+          <button type="button" class="secondary" id="export-backup">导出备份</button>
+          <label class="secondary file-button">导入备份<input id="import-backup" type="file" accept="application/json"></label>
+          <button type="button" class="secondary" id="export-bookmarks">导出到 Chrome 书签</button>
+          <button type="button" class="danger" id="clear-data">清空全部数据</button>
+        </div>
+      </section>
+
+      <footer><button type="button" class="secondary" id="reset-settings">恢复默认设置</button><button type="submit" class="primary">保存设置</button></footer>
+      <p id="status" role="status"></p>
+    </form>
+  </main>
+  <script type="module" src="js/options.js"></script>
+</body>
+</html>

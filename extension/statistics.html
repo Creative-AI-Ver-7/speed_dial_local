@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>访问统计 · Speed Dial 2</title>
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/statistics.css">
+</head>
+<body>
+  <header><h1>访问统计</h1><a href="newtab.html">返回快速拨号</a></header>
+  <main>
+    <nav id="stat-tabs">
+      <button class="active" data-view="overall">全部</button>
+      <button data-view="morning">早晨</button>
+      <button data-view="afternoon">下午</button>
+      <button data-view="evening">晚上</button>
+      <button data-view="night">深夜</button>
+      <button data-view="history">浏览历史</button>
+    </nav>
+    <section><h2 id="stat-title">最常访问的网站</h2><div id="stat-list"></div></section>
+  </main>
+  <script type="module" src="js/statistics.js"></script>
+</body>
+</html>

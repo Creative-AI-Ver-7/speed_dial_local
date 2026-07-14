@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Speed Dial 2</title>
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/newtab.css">
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4.8A2.8 2.8 0 0 1 7.8 2H20v17H7.5A2.5 2.5 0 0 0 5 21.5z"/><path d="M5 5v16.5M9 7h7"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 3h6l1 4H8zM7 7l1 14h8l1-14M10 11v6M14 11v6"/></symbol>
+  </svg>
+
+  <div class="ambient" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <section class="group-strip" aria-label="分组">
+        <div class="group-tabs" id="group-tabs"></div>
+        <button class="add-group" id="add-group" title="新建分组" aria-label="新建分组"><svg><use href="#i-plus"/></svg></button>
+      </section>
+
+      <label class="search-box">
+        <svg><use href="#i-search"/></svg>
+        <input id="search-input" type="search" autocomplete="off" placeholder="搜索">
+      </label>
+
+      <div class="top-actions">
+        <button class="icon-button" id="open-library" title="书签、历史记录和最近关闭" aria-label="打开侧栏"><svg><use href="#i-book"/></svg></button>
+        <button class="icon-button" id="open-stats" title="统计" aria-label="统计"><svg><use href="#i-chart"/></svg></button>
+        <button class="icon-button" id="open-settings" title="快速设置" aria-label="快速设置"><svg><use href="#i-settings"/></svg></button>
+        <button class="icon-button add-dial-button" id="add-dial" title="添加网站" aria-label="添加网站"><svg><use href="#i-plus"/></svg></button>
+      </div>
+    </header>
+
+    <main class="workspace">
+
+      <section class="dial-stage" aria-live="polite">
+        <div class="stage-heading">
+          <div>
+            <p class="eyebrow" id="stage-eyebrow">快速拨号</p>
+            <h1 id="stage-title">首页</h1>
+          </div>
+          <div class="stage-tools"><p class="stage-count" id="stage-count"></p><button class="ghost-button open-group-button" id="open-group"><span>打开全部</span><svg><use href="#i-arrow"/></svg></button></div>
+        </div>
+        <div class="dial-grid" id="dial-grid"></div>
+        <div class="empty-state" id="empty-state" hidden>
+          <span class="empty-orbit"><i></i></span>
+          <button class="first-dial-button" id="empty-add">点击这里添加第一个网站</button>
+          <button class="text-button" id="empty-top-sites">从常用网站中选择</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <button id="footer-sort" class="text-button">手动排序</button>
+    </footer>
+  </div>
+
+  <div id="sidebar-toggle" hidden></div>
+  <div class="sidebar-arrow" hidden></div>
+  <aside id="sidebars" aria-label="侧栏">
+    <section class="sidebar-panel" id="bookmarks-sidebar" hidden>
+      <h1>书签</h1>
+      <input class="sidebar-search" type="search" id="bookmarks-search" placeholder="搜索书签">
+      <ul id="bookmarks-list"></ul>
+    </section>
+    <section class="sidebar-panel" id="history-sidebar" hidden>
+      <h1>最近关闭的标签页</h1>
+      <input class="sidebar-search" type="search" id="history-search" placeholder="搜索历史记录">
+      <ul id="history-items"></ul>
+    </section>
+  </aside>
+
+  <dialog id="dial-dialog">
+    <form id="dial-form">
+      <div class="dialog-head"><h2 id="dial-dialog-title">添加网站</h2><button type="button" class="icon-button" data-close-dialog aria-label="关闭"><svg><use href="#i-close"/></svg></button></div>
+      <div class="dialog-body">
+        <input type="hidden" name="id">
+        <label class="field"><span>名称</span><input name="title" required maxlength="120" placeholder="网站名称"></label>
+        <label class="field"><span>网址</span><input name="url" required inputmode="url" placeholder="example.com"></label>
+        <label class="field"><span>分组</span><select name="groupId" required></select></label>
+        <fieldset class="thumbnail-choices">
+          <legend>缩略图</legend>
+          <label><input type="radio" name="thumbnailType" value="default"><span>网站图标<small>使用网站图标</small></span></label>
+          <label><input type="radio" name="thumbnailType" value="screenshot" checked><span>网页截图<small>自动打开网页，截图完成后关闭</small></span></label>
+          <label><input type="radio" name="thumbnailType" value="upload"><span>上传图片<small>选择一张图片</small></span></label>
+          <label><input type="radio" name="thumbnailType" value="url"><span>图片网址<small>无法加载时显示默认图标</small></span></label>
+        </fieldset>
+        <label class="field thumbnail-extra" data-thumbnail-field="upload" hidden><span>选择图片</span><input name="imageFile" type="file" accept="image/*"><small>建议小于 4 MB。</small></label>
+        <label class="field thumbnail-extra" data-thumbnail-field="url" hidden><span>图片网址</span><input name="imageUrl" inputmode="url" placeholder="https://…"></label>
+      </div>
+      <div class="dialog-foot"><button type="button" class="danger-button" id="delete-dial" hidden><svg><use href="#i-trash"/></svg>删除</button><span class="dialog-spacer"></span><button type="button" class="ghost-button" data-close-dialog>取消</button><button class="primary-button" type="submit">保存</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="top-sites-dialog" class="wide-dialog">
+    <form id="top-sites-form">
+      <div class="dialog-head"><h2>常用网站</h2><button type="button" class="icon-button" data-close-dialog aria-label="关闭"><svg><use href="#i-close"/></svg></button></div>
+      <div class="dialog-body"><div class="top-sites-grid" id="top-sites-list"></div></div>
+      <div class="dialog-foot"><button type="button" class="ghost-button" data-close-dialog>取消</button><button class="primary-button" type="submit">添加所选网站</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="group-dialog">
+    <form id="group-form">
+      <div class="dialog-head"><h2 id="group-dialog-title">新建分组</h2><button type="button" class="icon-button" data-close-dialog aria-label="关闭"><svg><use href="#i-close"/></svg></button></div>
+      <div class="dialog-body">
+        <input type="hidden" name="id">
+        <label class="field"><span>名称</span><input name="name" required maxlength="48" placeholder="工作"></label>
+        <label class="field" id="move-dials-field" hidden><span>将本组网站移动到</span><select name="fallbackGroupId"></select></label>
+      </div>
+      <div class="dialog-foot"><button type="button" class="danger-button" id="delete-group" hidden>删除分组</button><span class="dialog-spacer"></span><button type="button" class="ghost-button" data-close-dialog>取消</button><button class="primary-button" type="submit">保存</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="stats-dialog" class="wide-dialog">
+    <div class="dialog-head"><div><h2>访问统计</h2></div><button class="icon-button" data-close-dialog aria-label="关闭"><svg><use href="#i-close"/></svg></button></div>
+    <div class="dialog-body" id="stats-content"></div>
+  </dialog>
+
+  <dialog id="settings-dialog">
+    <form id="settings-form">
+      <div class="dialog-head"><h2>快速设置</h2><button type="button" class="icon-button" data-close-dialog aria-label="关闭"><svg><use href="#i-close"/></svg></button></div>
+      <div class="dialog-body quick-settings">
+        <div class="range-field"><span>列数 <output data-output="columns"></output></span><input name="columns" type="range" min="2" max="20" step="1"></div>
+        <div class="range-field"><span>间距 <output data-output="gap"></output></span><input name="gap" type="range" min="0" max="50" step="2"></div>
+        <div class="range-field"><span>页面宽度 <output data-output="dialSpace"></output></span><input name="dialSpace" type="range" min="10" max="100" step="5"></div>
+        <div class="switch-row"><label><span>垂直居中</span></label><input name="verticalCenter" type="checkbox"></div>
+        <div class="switch-row"><label><span>显示添加按钮</span></label><input name="showAddButton" type="checkbox"></div>
+        <div class="switch-row"><label><span>深色主题</span></label><input name="darkTheme" type="checkbox"></div>
+        <button type="button" class="text-button" id="open-full-options">更多设置</button>
+      </div>
+      <div class="dialog-foot"><button type="button" class="ghost-button" data-close-dialog>取消</button><button class="primary-button" type="submit">完成</button></div>
+    </form>
+  </dialog>
+
+  <div class="context-menu" id="page-context-menu" hidden>
+    <button data-command="add-dial">添加网站</button>
+    <button data-command="add-group">新建分组</button>
+    <hr>
+    <button data-command="settings">设置</button>
+    <button data-command="statistics">统计</button>
+  </div>
+  <div class="context-menu" id="dial-context-menu" hidden>
+    <button data-command="open-new-tab">在新标签页中打开</button>
+    <hr>
+    <button data-command="edit-dial">编辑</button>
+    <button data-command="delete-dial">删除</button>
+    <button data-command="refresh-thumbnail">重新生成缩略图</button>
+  </div>
+  <div class="context-menu" id="group-context-menu" hidden>
+    <button data-command="home-note" disabled>这是主分组</button>
+    <button data-command="open-group">打开全部网站</button>
+    <hr>
+    <button data-command="edit-group">编辑分组</button>
+    <button data-command="delete-group">删除分组</button>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script type="module" src="js/newtab.js"></script>
+</body>
+</html>
