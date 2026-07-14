@@ -38,9 +38,14 @@ node scripts/validate.mjs
 
 The extension requests Chrome bookmarks, history, sessions, Top Sites, tabs and website access for its local browser-integration features and user-requested webpage screenshots. Extension data remains in the active Chrome profile unless exported by the user.
 
-## Packaging
+## Branches and releases
 
-The GitHub Actions workflow validates the source and creates `speed-dial-2.zip`. The archive contains `manifest.json` at its root and can be extracted and loaded directly through Chrome's **Load unpacked** flow.
+- `dev` is the development branch.
+- `master` is the release branch.
+
+Every push to either branch is validated and packaged. A push to `master` also creates a GitHub Release automatically. Release versions start at `v0.1.0` and increment the patch number for each new release.
+
+The generated archive is named `speed-dial-2-<version>.zip`. It contains `manifest.json` at its root and can be extracted and loaded directly through Chrome's **Load unpacked** flow.
 
 ## License
 
