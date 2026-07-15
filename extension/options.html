@@ -50,7 +50,7 @@
           <label><span>缩略图比例</span><input name="thumbnailRatio" type="number" min="0.5" max="2" step="0.05"></label>
           <label><span>阴影</span><select name="shadowStyle"><option value="none">无</option><option value="box">方框阴影</option><option value="drop">投影</option><option value="glow">发光</option></select></label>
           <label><span>标题对齐</span><select name="titleAlign"><option value="left">左对齐</option><option value="center">居中</option><option value="right">右对齐</option></select></label>
-          <label><span>字体</span><select name="fontFamily"><option value="Helvetica, Arial, sans-serif">Helvetica</option><option value="Arial, sans-serif">Arial</option><option value="Georgia, serif">Georgia</option><option value="monospace">等宽字体</option></select></label>
+          <div class="font-option"><span>字体</span><div class="font-picker"><input name="fontFamily" list="font-family-list" placeholder="输入或选择字体"><button type="button" id="load-system-fonts">读取系统字体</button><datalist id="font-family-list"><option value="Helvetica, Arial, sans-serif"><option value="Arial, sans-serif"><option value="Microsoft YaHei, sans-serif"><option value="PingFang SC, sans-serif"><option value="Noto Sans CJK SC, sans-serif"><option value="Georgia, serif"><option value="monospace"></datalist></div></div>
           <label><span>字号</span><input name="fontSize" type="number" min="8" max="30"></label>
           <label><span>字体样式</span><select name="fontStyle"><option value="normal">正常</option><option value="italic">斜体</option></select></label>
           <label><span>字体粗细</span><select name="fontWeight"><option value="normal">正常</option><option value="bold">粗体</option></select></label>

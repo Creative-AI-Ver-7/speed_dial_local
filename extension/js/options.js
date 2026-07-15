@@ -73,6 +73,27 @@ document.querySelector("#clear-background").addEventListener("click", () => {
   showStatus("背景图片已移除");
 });
 
+document.querySelector("#load-system-fonts").addEventListener("click", async (event) => {
+  const button = event.currentTarget;
+  if (typeof window.queryLocalFonts !== "function") {
+    showStatus("当前 Chrome 版本不支持读取系统字体，可直接输入字体名称", true);
+    return;
+  }
+  button.disabled = true;
+  try {
+    const fonts = await window.queryLocalFonts();
+    const families = [...new Set(fonts.map((font) => font.family).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, "zh-CN"));
+    const list = document.querySelector("#font-family-list");
+    list.replaceChildren(...families.map((family) => new Option(family, family)));
+    showStatus(`已读取 ${families.length} 个系统字体`);
+  } catch (error) {
+    showStatus(error.name === "NotAllowedError" ? "未授权读取系统字体，也可以直接输入字体名称" : error.message, true);
+  } finally {
+    button.disabled = false;
+  }
+});
+
 document.querySelector("#reset-settings").addEventListener("click", async () => {
   if (!confirm("确定恢复所有默认设置吗？")) return;
   settings = await resetSettings();

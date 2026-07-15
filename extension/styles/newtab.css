@@ -121,19 +121,29 @@ body::after {
   padding-bottom: 0;
   color: var(--ink);
   text-align: left;
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+.dial-visual {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: var(--dial-thumb-height, 190px);
+  overflow: hidden;
   background: var(--dial-background, #fff);
   border: 1px solid var(--dial-border, #ddd);
   border-radius: var(--card-radius);
-  box-shadow: none;
-  overflow: hidden;
-  transition: border-color .15s, background-color .15s;
+  transition: border-color .15s, background-color .15s, box-shadow .15s;
 }
-:root[data-shadow="box"] .dial-link { box-shadow: 0 0 4px rgba(0,0,0,.28); }
-:root[data-shadow="drop"] .dial-link { box-shadow: 0 5px 5px -3px rgba(0,0,0,.42); }
-:root[data-shadow="glow"] .dial-link { box-shadow: 0 0 15px rgba(0,0,0,.24); }
-.dial-link:hover { background: var(--dial-background-hover, #fff); border-color: var(--dial-border-hover, #ccc); }
-.dial-card.frequent .dial-link { border-color: color-mix(in srgb, var(--accent) 42%, var(--line)); }
-.dial-visual { position: relative; display: block; width: 100%; height: var(--dial-thumb-height, 190px); overflow: hidden; background: #fff; border-bottom: 1px solid var(--dial-border, #ddd); }
+:root[data-shadow="box"] .dial-visual { box-shadow: 0 0 3px rgba(0,0,0,.22); }
+:root[data-shadow="drop"] .dial-visual { box-shadow: 0 4px 4px -3px rgba(0,0,0,.36); }
+:root[data-shadow="glow"] .dial-visual { box-shadow: 0 0 6px rgba(0,0,0,.14); }
+.dial-link:hover .dial-visual { background: var(--dial-background-hover, #fff); border-color: var(--dial-border-hover, #ccc); }
+.dial-card.frequent .dial-visual { border-color: color-mix(in srgb, var(--accent) 42%, var(--line)); }
 .dial-visual::after { display: none; }
 .dial-image { width: 100%; height: 100%; object-fit: var(--thumbnail-fit, contain); object-position: top center; }
 .default-thumb { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(145deg, hsl(var(--site-hue) 28% 96%), hsl(calc(var(--site-hue) + 25) 24% 90%)); }
@@ -180,7 +190,8 @@ body::after {
 
 #sidebar-toggle { position: fixed; z-index: 29; top: 20%; right: 0; width: 4%; height: 70%; background: transparent; }
 .sidebar-arrow { position: fixed; top: 50%; right: 1%; width: 20px; height: 32px; margin-top: -16px; background: url(../images/newtab.sidebar.arrow.png) center / contain no-repeat; pointer-events: none; }
-#sidebars { position: fixed; z-index: 30; top: 0; right: 0; display: flex; height: 100vh; overflow: hidden; color: #000; background: #fff; transition: right 175ms ease; }
+#sidebars { position: fixed; z-index: 30; top: 0; right: 0; display: flex; height: 100vh; overflow: hidden; color: #000; background: #fff; visibility: hidden; transition: none; }
+#sidebars.sidebar-ready { visibility: visible; transition: right 175ms ease; }
 .sidebar-panel { box-sizing: border-box; width: 281px; height: 100%; overflow: auto; border-left: 1px solid #ccc; background: #fff; }
 .sidebar-panel h1 { margin: 0; padding: 20px 20px 4px; color: #222; font-size: 18px; font-weight: 400; }
 .sidebar-search { box-sizing: border-box; width: 240px; margin: 10px 20px 20px; padding: 8px 30px 8px 10px; color: #222; background: #fff url(../images/sidebar.search.svg) 210px 10px no-repeat; border: 1px solid #ddd; border-radius: 2px; }

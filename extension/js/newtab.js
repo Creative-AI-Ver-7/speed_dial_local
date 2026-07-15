@@ -294,7 +294,7 @@ function renderDials() {
     title.append(strong, small);
     const visits = document.createElement("span");
     visits.className = "visit-count";
-    visits.textContent = `${dial.visits || 0}×`;
+    visits.textContent = String(dial.visits || 0);
     meta.append(title, visits);
     link.append(visual, meta);
 

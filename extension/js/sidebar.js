@@ -227,6 +227,10 @@ export function initSidebar({ settings, isSorting = () => false }) {
   });
 
   configure(settings);
+  // Commit the collapsed position before enabling transitions so page startup
+  // never animates the sidebar from its default right: 0 position.
+  shell.getBoundingClientRect();
+  shell.classList.add("sidebar-ready");
   return {
     refresh(nextSettings = currentSettings) {
       configure(nextSettings);

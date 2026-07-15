@@ -16,10 +16,13 @@ section h2 { margin: 0 0 18px; color: #222; font-size: 20px; font-weight: 400; }
 .preview-image { height: 220px; background: #fff url(../images/options.dial.jpg) center / contain no-repeat; }
 .preview-title { height: 28px; padding: 4px 3px; color: #8c7e7e; font-size: 16px; text-align: center; }
 .option-grid { display: grid; grid-template-columns: 1fr; }
-.option-grid label { display: grid; grid-template-columns: 280px minmax(0,1fr); align-items: center; min-height: 42px; padding: 4px 10px; font-size: 14px; }
-.option-grid label:nth-child(odd) { background: #fafafa; border-radius: 4px; }
-.option-grid label > span, .full-field > span { color: #555; font-size: 14px; font-weight: 600; }
-.option-grid input[type="number"], .option-grid input[type="url"], .option-grid select { box-sizing: border-box; width: 260px; padding: 7px 8px; color: #444; background: #fff; border: 1px solid #ccc; border-radius: 2px; }
+.option-grid label, .option-grid .font-option { display: grid; grid-template-columns: 280px minmax(0,1fr); align-items: center; min-height: 42px; padding: 4px 10px; font-size: 14px; }
+.option-grid label:nth-child(odd), .option-grid .font-option:nth-child(odd) { background: #fafafa; border-radius: 4px; }
+.option-grid label > span, .option-grid .font-option > span, .full-field > span { color: #555; font-size: 14px; font-weight: 600; }
+.option-grid input[type="number"], .option-grid input[type="url"], .option-grid select, .font-picker input { box-sizing: border-box; width: 260px; padding: 7px 8px; color: #444; background: #fff; border: 1px solid #ccc; border-radius: 2px; }
+.font-picker { display: flex; align-items: center; gap: 8px; }
+.font-picker input { flex: 1; min-width: 0; }
+.font-picker button { flex: 0 0 auto; color: #3c87da; background: #fff; border: 1px solid #ccc; }
 .switches { display: grid; grid-template-columns: 1fr; margin-top: 10px; }
 .switches label { display: grid; grid-template-columns: 24px 1fr; align-items: center; min-height: 42px; padding: 0 10px; color: #555; font-size: 14px; }
 .switches label:nth-child(odd) { background: #fafafa; border-radius: 4px; }
@@ -40,4 +43,4 @@ button, .file-button { min-height: 32px; padding: 0 14px; border-radius: 3px; fo
 #options-form > footer { display: flex; justify-content: space-between; margin: 22px 30px 0; padding: 28px 0 0; border-top: 1px solid #eee; }
 #status { position: fixed; right: 22px; bottom: 22px; min-width: 120px; margin: 0; padding: 10px 14px; color: #333; background: #fff; border: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0,0,0,.12); opacity: 0; transition: opacity .15s; }
 #status.visible { opacity: 1; }
-@media (max-width: 1000px) { .options-shell { width: calc(100% - 30px); }.option-grid label { grid-template-columns: 220px 1fr; } }
+@media (max-width: 1000px) { .options-shell { width: calc(100% - 30px); }.option-grid label, .option-grid .font-option { grid-template-columns: 220px 1fr; } }
