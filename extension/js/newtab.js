@@ -267,7 +267,6 @@ function renderDials() {
     card.className = `dial-card${frequentIds.has(dial.id) ? " frequent" : ""}`;
     card.dataset.dialId = dial.id;
     card.draggable = !state.query && state.settings.sortMode === "manual";
-    card.style.animationDelay = `${Math.min(index * 35, 280)}ms`;
 
     const link = document.createElement("a");
     link.className = "dial-link";

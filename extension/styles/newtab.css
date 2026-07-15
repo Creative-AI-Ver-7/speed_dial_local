@@ -1,25 +1,14 @@
 .svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
-html, body, .app-shell { border: 0; border-radius: 0; outline: 0; box-shadow: none; }
-html { background: var(--background-color); }
-body { min-height: 100vh; overflow-x: hidden; }
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background-color: var(--background-color);
+html { background-color: var(--background-color); }
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: transparent;
   background-image: var(--user-background);
   background-repeat: var(--background-repeat, no-repeat);
   background-position: var(--background-position, left top);
   background-size: var(--background-size, auto);
-}
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: linear-gradient(rgba(255,255,255,.015), rgba(255,255,255,.015));
+  background-attachment: fixed;
 }
 .ambient { display: none; }
 .app-shell { min-height: 100vh; display: flex; flex-direction: column; }
@@ -184,7 +173,8 @@ body::after {
 .sidebar-arrow { position: fixed; top: 50%; right: 1%; width: 20px; height: 32px; margin-top: -16px; background: url(../images/newtab.sidebar.arrow.png) center / contain no-repeat; pointer-events: none; }
 #sidebars { position: fixed; z-index: 30; top: 0; right: 0; display: flex; height: 100vh; overflow: hidden; color: #000; background: #fff; visibility: hidden; transition: none; }
 #sidebars.sidebar-ready { visibility: visible; transition: right 175ms ease; }
-.sidebar-panel { box-sizing: border-box; width: 281px; height: 100%; overflow: auto; border-left: 1px solid #ccc; background: #fff; }
+.sidebar-panel { box-sizing: border-box; width: 281px; height: 100%; overflow: auto; border-left: 1px solid #ccc; background: #fff; scrollbar-width: none; }
+.sidebar-panel::-webkit-scrollbar { display: none; }
 .sidebar-panel h1 { margin: 0; padding: 20px 20px 4px; color: #222; font-size: 18px; font-weight: 400; }
 .sidebar-search { box-sizing: border-box; width: 240px; margin: 10px 20px 20px; padding: 8px 30px 8px 10px; color: #222; background: #fff url(../images/sidebar.search.svg) 210px 10px no-repeat; border: 1px solid #ddd; border-radius: 2px; }
 .sidebar-panel ul { margin: 0; padding: 0; }
@@ -192,7 +182,7 @@ body::after {
 .sidebar-panel li:hover { background: #f7f7f7; }
 .sidebar-panel li > a,
 .sidebar-panel li > button { box-sizing: border-box; display: block; width: 100%; min-height: 42px; padding: 12px 20px 12px 52px; overflow: hidden; color: #333; text-align: left; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; background-color: transparent; background-position: 20px center; background-repeat: no-repeat; background-size: 18px; }
-.sidebar-panel li > a b { font-weight: 600; }
+.sidebar-panel li > a b { font-weight: normal; }
 .bookmark-folder > button { background-image: url(../images/sidebar.folder.svg); }
 .bookmark-back > button { background-image: url(../images/sidebar.back.png); }
 .session-command > button { padding-left: 20px !important; color: #555; }
@@ -243,7 +233,7 @@ body::after {
 .top-row > span:first-child { color: var(--accent); }
 .top-row small { color: #999; }
 
-@keyframes card-in { from { opacity: 0; transform: translateY(4px); } }
+@keyframes card-in { from { opacity: 0; } }
 @media (max-width: 900px) {
   .topbar { padding-left: 12px; }
   .search-box { width: 34px; padding: 0 8px; }
