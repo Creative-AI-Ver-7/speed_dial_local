@@ -135,7 +135,7 @@ body::after {
 :root[data-shadow="glow"] .dial-link { box-shadow: 0 0 6px rgba(0,0,0,.14); }
 .dial-link:hover { background: var(--dial-background-hover, #fff); border-color: var(--dial-border-hover, #ccc); }
 .dial-card.frequent .dial-link { border-color: color-mix(in srgb, var(--accent) 42%, var(--line)); }
-.dial-visual { position: relative; display: block; width: 100%; height: var(--dial-thumb-height, 190px); overflow: hidden; background: #fff; border-bottom: 1px solid var(--dial-border, #ddd); }
+.dial-visual { position: relative; display: block; width: 100%; height: var(--dial-thumb-height, 190px); overflow: hidden; background: #fff; }
 .dial-visual::after { display: none; }
 .dial-image { width: 100%; height: 100%; object-fit: var(--thumbnail-fit, contain); object-position: top center; }
 .default-thumb { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(145deg, hsl(var(--site-hue) 28% 96%), hsl(calc(var(--site-hue) + 25) 24% 90%)); }
