@@ -4,6 +4,7 @@ import { downloadJson, fileToDataUrl } from "./utils.js";
 
 const form = document.querySelector("#options-form");
 const status = document.querySelector("#status");
+const fontSelect = document.querySelector("#font-family-select");
 let settings;
 let backgroundDraft = "";
 let statusTimer;
@@ -33,6 +34,9 @@ function populate(values) {
   NUMBER_FIELDS.forEach((name) => { form.elements[name].value = values[name]; });
   BOOLEAN_FIELDS.forEach((name) => { form.elements[name].checked = Boolean(values[name]); });
   STRING_FIELDS.forEach((name) => { form.elements[name].value = values[name] ?? ""; });
+  fontSelect.value = [...fontSelect.options].some((option) => option.value === values.fontFamily)
+    ? values.fontFamily
+    : "";
   backgroundDraft = values.backgroundImage || "";
 }
 
@@ -73,6 +77,10 @@ document.querySelector("#clear-background").addEventListener("click", () => {
   showStatus("背景图片已移除");
 });
 
+fontSelect.addEventListener("change", () => {
+  if (fontSelect.value) form.elements.fontFamily.value = fontSelect.value;
+});
+
 document.querySelector("#load-system-fonts").addEventListener("click", async (event) => {
   const button = event.currentTarget;
   if (typeof window.queryLocalFonts !== "function") {
@@ -84,9 +92,12 @@ document.querySelector("#load-system-fonts").addEventListener("click", async (ev
     const fonts = await window.queryLocalFonts();
     const families = [...new Set(fonts.map((font) => font.family).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, "zh-CN"));
-    const list = document.querySelector("#font-family-list");
-    list.replaceChildren(...families.map((family) => new Option(family, family)));
-    showStatus(`已读取 ${families.length} 个系统字体`);
+    fontSelect.replaceChildren(
+      new Option("选择字体", ""),
+      ...families.map((family) => new Option(family, family)),
+    );
+    fontSelect.value = families.includes(form.elements.fontFamily.value) ? form.elements.fontFamily.value : "";
+    showStatus(`已读取 ${families.length} 个系统字体，可从下拉列表选择`);
   } catch (error) {
     showStatus(error.name === "NotAllowedError" ? "未授权读取系统字体，也可以直接输入字体名称" : error.message, true);
   } finally {
