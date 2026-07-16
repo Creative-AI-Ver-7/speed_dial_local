@@ -121,7 +121,7 @@ body {
 }
 :root[data-shadow="box"] .dial-link { box-shadow: 0 0 3px rgba(0,0,0,.22); }
 :root[data-shadow="drop"] .dial-link { box-shadow: 0 4px 4px -3px rgba(0,0,0,.36); }
-:root[data-shadow="glow"] .dial-link { box-shadow: 0 0 6px rgba(0,0,0,.14); }
+:root[data-shadow="glow"] .dial-link { box-shadow: 0 1px 4px rgba(0,0,0,.2); }
 .dial-link:hover { background: var(--dial-background-hover, #fff); border-color: var(--dial-border-hover, #ccc); }
 .dial-card.frequent .dial-link { border-color: color-mix(in srgb, var(--accent) 42%, var(--line)); }
 .dial-visual { position: relative; display: block; width: 100%; height: var(--dial-thumb-height, 190px); overflow: hidden; background: #fff; }
@@ -136,12 +136,13 @@ body {
 .card-menu { position: absolute; z-index: 4; top: 6px; right: 6px; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; color: #555; background: rgba(255,255,255,.9); border: 1px solid rgba(0,0,0,.12); border-radius: 2px; opacity: 0; }
 .card-menu svg { width: 13px; height: 13px; fill: currentColor; }
 .dial-card:hover .card-menu { opacity: 1; }
-.dial-meta { display: flex; align-items: center; justify-content: var(--title-align, center); gap: 5px; min-height: 27px; padding: 3px 7px 2px; }
+.dial-meta { display: flex; align-items: center; justify-content: var(--title-align, center); gap: 0; min-height: 27px; padding: 3px 7px 2px; }
 .dial-title { min-width: 0; flex: 0 1 auto; }
 .dial-title strong { display: block; overflow: hidden; color: var(--title-color, #8c7e7e); font-family: var(--dial-font-family); font-size: var(--dial-font-size, 11px); font-style: var(--dial-font-style); font-weight: var(--dial-font-weight); text-align: var(--title-align, center); text-overflow: ellipsis; white-space: nowrap; }
 .dial-link:hover .dial-title strong { color: var(--title-color-hover, #333); }
 .dial-title small { display: none; }
-.visit-count { flex: 0 0 auto; color: #aaa; font-size: 10px; }
+.visit-count { flex: 0 0 auto; padding: 0 4px; color: var(--title-color, #8c7e7e); font-family: var(--dial-font-family); font-size: var(--dial-font-size, 11px); font-style: var(--dial-font-style); font-weight: var(--dial-font-weight); opacity: .4; }
+.dial-link:hover .visit-count { color: var(--title-color-hover, #333); opacity: 1; }
 .hide-titles .dial-meta { display: none; }
 .hide-visits .visit-count { display: none; }
 .add-dial-tile {
