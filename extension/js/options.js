@@ -115,7 +115,7 @@ document.querySelector("#reset-settings").addEventListener("click", async () => 
 document.querySelector("#export-backup").addEventListener("click", async () => {
   const backup = await exportBackup();
   backup.settings = await getSettings();
-  downloadJson(`speed-dial-2-${new Date().toISOString().slice(0, 10)}.json`, backup);
+  downloadJson(`zero-dial-${new Date().toISOString().slice(0, 10)}.json`, backup);
   showStatus("备份已导出");
 });
 

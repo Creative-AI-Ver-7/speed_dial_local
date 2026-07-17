@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Speed Dial 2",
-  "short_name": "Speed Dial 2",
+  "name": "Zero Dial",
+  "short_name": "Zero Dial",
   "version": "0.1.0",
   "description": "Chrome 新标签页快速拨号扩展。",
   "minimum_chrome_version": "120",

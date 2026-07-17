@@ -41,4 +41,4 @@ if (errors.length) {
   console.error(errors.join("\n"));
   process.exit(1);
 }
-console.log(`Speed Dial 2 ${manifest.version}: manifest, entry points and code policy OK`);
+console.log(`Zero Dial ${manifest.version}: manifest, entry points and code policy OK`);

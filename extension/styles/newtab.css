@@ -13,7 +13,7 @@ body {
 .ambient { display: none; }
 .app-shell { min-height: 100vh; display: flex; flex-direction: column; }
 
-/* Original Speed Dial 2 layout: fixed group bar, compact search and settings. */
+/* Original layout parity: fixed group bar, compact search and settings. */
 .topbar {
   position: fixed;
   z-index: 20;

@@ -206,7 +206,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message?.type === "export-bookmarks") {
       const groups = await getGroups();
       const dials = await getDials();
-      const root = await chrome.bookmarks.create({ title: `Speed Dial 2 — ${new Date().toLocaleDateString()}` });
+      const root = await chrome.bookmarks.create({ title: `Zero Dial — ${new Date().toLocaleDateString()}` });
       for (const group of groups) {
         const folder = await chrome.bookmarks.create({ parentId: root.id, title: group.name });
         for (const dial of dials.filter((item) => item.groupId === group.id)) {

@@ -65,13 +65,13 @@ jobs:
         run: |
           mkdir -p dist
           cd extension
-          zip -r "../dist/speed-dial-2-${{ steps.version.outputs.version }}.zip" .
+          zip -r "../dist/zero-dial-${{ steps.version.outputs.version }}.zip" .
 
       - name: Upload package artifact
         uses: actions/upload-artifact@v6
         with:
-          name: speed-dial-2-${{ steps.version.outputs.version }}
-          path: dist/speed-dial-2-${{ steps.version.outputs.version }}.zip
+          name: zero-dial-${{ steps.version.outputs.version }}
+          path: dist/zero-dial-${{ steps.version.outputs.version }}.zip
           if-no-files-found: error
 
       - name: Create or update GitHub Release
@@ -81,12 +81,12 @@ jobs:
           TAG: ${{ steps.version.outputs.tag }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          package="dist/speed-dial-2-${VERSION}.zip"
+          package="dist/zero-dial-${VERSION}.zip"
           if gh release view "${TAG}" >/dev/null 2>&1; then
             gh release upload "${TAG}" "${package}" --clobber
           else
             gh release create "${TAG}" "${package}" \
               --target "${GITHUB_SHA}" \
-              --title "Speed Dial 2 ${TAG}" \
+              --title "Zero Dial ${TAG}" \
               --generate-notes
           fi

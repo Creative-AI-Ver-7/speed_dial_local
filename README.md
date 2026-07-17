@@ -1,52 +1,56 @@
-# Speed Dial 2
+# Zero Dial
 
-A local-first Chrome new-tab speed dial extension built with Manifest V3.
+Zero Dial 是一个基于 Manifest V3 的 Chrome 新标签页快速拨号扩展。
 
-This is an independent community implementation. It is not affiliated with or endorsed by the original Speed Dial 2 service.
+## 项目背景
 
-## Features
+本项目源于对旧版 Speed Dial 2 本地快速拨号体验的认可。随着 Chrome 内核和扩展平台持续更新，旧版所依赖的技术架构已无法适配现代 Chrome，因此本项目借助 AI 辅助开发，重新实现相近的本地使用体验。
 
-- Website and group management
-- Drag-and-drop sorting and cross-group moving
-- Local search and visit statistics
-- Automatic, uploaded and URL-based thumbnails
-- Chrome bookmarks, history, recently closed tabs and Top Sites integration
-- Customizable layout, appearance, background and sidebars
-- JSON backup and restore
-- Export to Chrome bookmarks
-- Local storage with IndexedDB and `chrome.storage.local`
+Zero Dial 是独立的社区实现，与原 Speed Dial 2 服务及其开发者没有关联，也未获得其认可或授权。本项目不接入原服务提供的账号、云同步或其他在线服务。
 
-Account, cloud sync, payment, advertising, recommendations, analytics, telemetry and remote executable code are not included.
+## 功能
 
-## Installation
+- 网站和分组管理
+- 拖拽排序及跨分组移动
+- 本地搜索与访问统计
+- 自动截图、上传图片及图片 URL 缩略图
+- Chrome 书签、历史记录、最近关闭标签页和常用网站集成
+- 可配置的布局、外观、背景和侧栏
+- JSON 备份与恢复
+- 导出到 Chrome 书签
+- 使用 IndexedDB 和 `chrome.storage.local` 保存数据
 
-1. Download and extract the packaged ZIP from the latest GitHub Actions artifact or clone this repository.
-2. Open `chrome://extensions/` in Chrome.
-3. Enable **Developer mode**.
-4. Select **Load unpacked**.
-5. Choose the extracted extension directory containing `manifest.json` (the repository's `extension/` directory).
+本项目不包含账号、云同步、支付、广告、推荐、Analytics、遥测或远程可执行代码。扩展不会向项目维护者或自有服务器上传书签、历史记录、截图、设置或其他用户数据。
 
-## Development
+## 安装
 
-No build step or third-party runtime dependency is required.
+1. 从最新 GitHub Release 下载并解压安装包。
+2. 打开 `chrome://extensions/`。
+3. 启用“开发者模式”。
+4. 点击“加载已解压的扩展程序”。
+5. 选择包含 `manifest.json` 的解压目录；直接使用仓库源码时请选择 `extension/`。
 
-Run the validation checks with:
+## 开发
+
+项目不需要构建步骤，也没有第三方运行时依赖。
+
+运行校验：
 
 ```bash
 node scripts/validate.mjs
 ```
 
-The extension requests Chrome bookmarks, history, sessions, Top Sites, tabs and website access for its local browser-integration features and user-requested webpage screenshots. Extension data remains in the active Chrome profile unless exported by the user.
+扩展使用 Chrome 的书签、历史记录、会话、常用网站、标签页和网页访问权限实现对应的本地浏览器集成功能，以及用户主动请求的网页截图。扩展数据保存在当前 Chrome Profile 中，只有用户主动导出备份时才会写出 JSON 文件。
 
-## Branches and releases
+## 分支与发布
 
-- `dev` is the development branch.
-- `master` is the release branch.
+- `dev` 为开发分支。
+- `master` 为发布分支。
 
-Every push to either branch is validated and packaged. A push to `master` also creates a GitHub Release automatically. Release versions start at `v0.1.0` and increment the patch number for each new release.
+推送至两个分支时都会自动校验并打包；推送至 `master` 时还会自动递增补丁版本并创建 GitHub Release。
 
-The generated archive is named `speed-dial-2-<version>.zip`. It contains `manifest.json` at its root and can be extracted and loaded directly through Chrome's **Load unpacked** flow.
+安装包命名为 `zero-dial-<版本>.zip`，其根目录包含 `manifest.json`，解压后可以直接侧载。
 
-## License
+## 许可证
 
-Licensed under the [MIT License](LICENSE).
+本项目采用 [MIT License](LICENSE)。
