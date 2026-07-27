@@ -33,8 +33,11 @@ export function initSidebar({ settings, isSorting = () => false }) {
 
   let currentSettings = settings;
   let bookmarkFolderId = "1";
+  let bookmarkRequestId = 0;
+  let historyRequestId = 0;
   let panelCount = 0;
   let width = 0;
+  let isOpen = false;
 
   function configure(nextSettings = currentSettings) {
     currentSettings = nextSettings;
@@ -42,6 +45,7 @@ export function initSidebar({ settings, isSorting = () => false }) {
     historyPanel.hidden = !(currentSettings.sidebarEnabled && currentSettings.sidebarHistory);
     panelCount = [bookmarkPanel, historyPanel].filter((panel) => !panel.hidden).length;
     width = panelCount * 281;
+    isOpen = false;
     shell.style.width = `${width}px`;
     shell.style.right = `${panelCount ? 1 - width : 0}px`;
     trigger.hidden = panelCount === 0;
@@ -49,10 +53,11 @@ export function initSidebar({ settings, isSorting = () => false }) {
   }
 
   async function loadBookmarks(folderId = bookmarkFolderId) {
-    bookmarkFolderId = folderId || "1";
-    bookmarkList.replaceChildren();
+    const requestId = ++bookmarkRequestId;
+    const nextFolderId = folderId || "1";
+    const content = document.createDocumentFragment();
     try {
-      const [folder] = await chrome.bookmarks.get(bookmarkFolderId);
+      const [folder] = await chrome.bookmarks.get(nextFolderId);
       if (folder?.parentId) {
         const back = document.createElement("li");
         back.className = "bookmark-folder bookmark-back";
@@ -61,12 +66,12 @@ export function initSidebar({ settings, isSorting = () => false }) {
         link.type = "button";
         link.textContent = "返回";
         back.append(link);
-        bookmarkList.append(back);
+        content.append(back);
       }
-      const children = await chrome.bookmarks.getChildren(bookmarkFolderId);
+      const children = await chrome.bookmarks.getChildren(nextFolderId);
       for (const node of children) {
         if (node.url) {
-          bookmarkList.append(makeLinkRow({ title: node.title, url: node.url, className: "bookmark-link" }));
+          content.append(makeLinkRow({ title: node.title, url: node.url, className: "bookmark-link" }));
         } else {
           const item = document.createElement("li");
           item.className = "bookmark-folder";
@@ -75,19 +80,24 @@ export function initSidebar({ settings, isSorting = () => false }) {
           button.type = "button";
           button.textContent = node.title || "未命名文件夹";
           item.append(button);
-          bookmarkList.append(item);
+          content.append(item);
         }
       }
+      if (requestId !== bookmarkRequestId) return;
+      bookmarkFolderId = nextFolderId;
+      bookmarkList.replaceChildren(content);
     } catch (error) {
+      if (requestId !== bookmarkRequestId) return;
       const item = document.createElement("li");
       item.className = "sidebar-note";
       item.textContent = error.message;
-      bookmarkList.append(item);
+      bookmarkList.replaceChildren(item);
     }
   }
 
   async function searchBookmarks(query) {
-    bookmarkList.replaceChildren();
+    const requestId = ++bookmarkRequestId;
+    const content = document.createDocumentFragment();
     const back = document.createElement("li");
     back.className = "bookmark-folder bookmark-back";
     back.dataset.folderId = "1";
@@ -95,11 +105,13 @@ export function initSidebar({ settings, isSorting = () => false }) {
     button.type = "button";
     button.textContent = "返回";
     back.append(button);
-    bookmarkList.append(back);
+    content.append(back);
     const results = await chrome.bookmarks.search(query);
+    if (requestId !== bookmarkRequestId) return;
     results.filter((node) => node.url).forEach((node) => {
-      bookmarkList.append(makeLinkRow({ title: node.title, url: node.url, className: "bookmark-link" }));
+      content.append(makeLinkRow({ title: node.title, url: node.url, className: "bookmark-link" }));
     });
+    bookmarkList.replaceChildren(content);
   }
 
   function sessionDetails(session) {
@@ -112,12 +124,14 @@ export function initSidebar({ settings, isSorting = () => false }) {
   }
 
   async function loadRecentlyClosed() {
-    historyList.replaceChildren();
+    const requestId = ++historyRequestId;
+    const content = document.createDocumentFragment();
     const { dismissedSessionIds = [] } = await chrome.storage.local.get("dismissedSessionIds");
     const dismissed = new Set(dismissedSessionIds);
     const sessions = (await chrome.sessions.getRecentlyClosed({ maxResults: 25 }))
       .map(sessionDetails)
       .filter((item) => item.sessionId && !dismissed.has(item.sessionId));
+    if (requestId !== historyRequestId) return;
 
     if (sessions.length > 1) {
       const restoreAll = document.createElement("li");
@@ -126,7 +140,7 @@ export function initSidebar({ settings, isSorting = () => false }) {
       button.type = "button";
       button.textContent = `恢复 ${sessions.length} 个标签页`;
       restoreAll.append(button);
-      historyList.append(restoreAll);
+      content.append(restoreAll);
     }
 
     for (const session of sessions) {
@@ -136,14 +150,14 @@ export function initSidebar({ settings, isSorting = () => false }) {
         event.preventDefault();
         await chrome.sessions.restore(session.sessionId);
       });
-      historyList.append(item);
+      content.append(item);
     }
 
     if (!sessions.length) {
       const empty = document.createElement("li");
       empty.className = "sidebar-note";
       empty.textContent = "没有最近关闭的标签页";
-      historyList.append(empty);
+      content.append(empty);
     } else {
       const clear = document.createElement("li");
       clear.className = "session-command clear-sessions";
@@ -151,25 +165,30 @@ export function initSidebar({ settings, isSorting = () => false }) {
       button.type = "button";
       button.textContent = "清除列表";
       clear.append(button);
-      historyList.append(clear);
+      content.append(clear);
     }
+    historyList.replaceChildren(content);
   }
 
   async function searchHistory(query) {
-    historyList.replaceChildren();
+    const requestId = ++historyRequestId;
+    const content = document.createDocumentFragment();
     const results = await chrome.history.search({ text: query, maxResults: 25 });
+    if (requestId !== historyRequestId) return;
     results.forEach((entry) => {
-      historyList.append(makeLinkRow({
+      content.append(makeLinkRow({
         title: entry.title,
         url: entry.url,
         subtitle: formatRelativeTime(entry.lastVisitTime),
         className: "history-link",
       }));
     });
+    historyList.replaceChildren(content);
   }
 
   function open() {
-    if (!panelCount || isSorting()) return;
+    if (!panelCount || isSorting() || isOpen) return;
+    isOpen = true;
     shell.style.right = "0px";
     if (!bookmarkPanel.hidden && !bookmarkList.children.length) loadBookmarks().catch(console.error);
     if (!historyPanel.hidden) loadRecentlyClosed().catch(console.error);
@@ -177,6 +196,7 @@ export function initSidebar({ settings, isSorting = () => false }) {
 
   function close() {
     if (!panelCount) return;
+    isOpen = false;
     shell.style.right = `${1 - width}px`;
   }
 
