@@ -31,6 +31,7 @@ export function initSidebar({ settings, isSorting = () => false }) {
   const historySearch = $("#history-search");
   if (!shell || !trigger || !workspace) return { refresh() {} };
 
+  const panelWidth = Number.parseFloat(getComputedStyle(shell).getPropertyValue("--sidebar-panel-width")) || 340;
   let currentSettings = settings;
   let bookmarkFolderId = "1";
   let bookmarkRequestId = 0;
@@ -44,7 +45,7 @@ export function initSidebar({ settings, isSorting = () => false }) {
     bookmarkPanel.hidden = !(currentSettings.sidebarEnabled && currentSettings.sidebarBookmarks);
     historyPanel.hidden = !(currentSettings.sidebarEnabled && currentSettings.sidebarHistory);
     panelCount = [bookmarkPanel, historyPanel].filter((panel) => !panel.hidden).length;
-    width = panelCount * 281;
+    width = panelCount * panelWidth;
     isOpen = false;
     shell.style.width = `${width}px`;
     shell.style.right = `${panelCount ? 1 - width : 0}px`;
