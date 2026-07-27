@@ -1,5 +1,6 @@
 import { readFile, readdir } from "node:fs/promises";
 import { extname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const root = new URL("../extension/", import.meta.url);
 const manifest = JSON.parse(await readFile(new URL("manifest.json", root), "utf8"));
@@ -26,7 +27,7 @@ async function walk(directory) {
   return files;
 }
 
-for (const path of await walk(new URL(".", root).pathname)) {
+for (const path of await walk(fileURLToPath(root))) {
   if (![".html", ".js"].includes(extname(path))) continue;
   const source = await readFile(path, "utf8");
   if (/<script\b[^>]*\bsrc=["']https?:/i.test(source)) errors.push(`${path}: remote script`);

@@ -41,7 +41,7 @@ body {
   white-space: nowrap;
 }
 .group-tab .group-label:hover { color: var(--ink); background: rgba(0,0,0,.025); }
-.group-tab.active .group-label { color: var(--accent); border-bottom-color: var(--accent); }
+.group-tab.active .group-label { color: var(--ink-soft); border-bottom-color: var(--ink-soft); }
 .group-tab.drag-over { background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .group-tab .group-menu {
   align-self: center;
