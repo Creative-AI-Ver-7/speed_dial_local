@@ -172,12 +172,12 @@ body {
 
 #sidebar-toggle { position: fixed; z-index: 29; top: 20%; right: 0; width: 4%; height: 70%; background: transparent; }
 .sidebar-arrow { position: fixed; top: 50%; right: 1%; width: 20px; height: 32px; margin-top: -16px; background: url(../images/newtab.sidebar.arrow.png) center / contain no-repeat; pointer-events: none; }
-#sidebars { position: fixed; z-index: 30; top: 0; right: 0; display: flex; height: 100vh; overflow: hidden; color: #000; background: #fff; visibility: hidden; transition: none; }
+#sidebars { --sidebar-panel-width: 340px; position: fixed; z-index: 30; top: 0; right: 0; display: flex; height: 100vh; overflow: hidden; color: #000; background: #fff; visibility: hidden; transition: none; }
 #sidebars.sidebar-ready { visibility: visible; transition: right 175ms ease; }
-.sidebar-panel { box-sizing: border-box; width: 281px; height: 100%; overflow: auto; border-left: 1px solid #ccc; background: #fff; scrollbar-width: none; }
+.sidebar-panel { box-sizing: border-box; flex: 0 0 var(--sidebar-panel-width); width: var(--sidebar-panel-width); height: 100%; overflow: auto; border-left: 1px solid #ccc; background: #fff; scrollbar-width: none; }
 .sidebar-panel::-webkit-scrollbar { display: none; }
 .sidebar-panel h1 { margin: 0; padding: 20px 20px 4px; color: #222; font-size: 18px; font-weight: 400; }
-.sidebar-search { box-sizing: border-box; width: 240px; margin: 10px 20px 20px; padding: 8px 30px 8px 10px; color: #222; background: #fff url(../images/sidebar.search.svg) 210px 10px no-repeat; border: 1px solid #ddd; border-radius: 2px; }
+.sidebar-search { box-sizing: border-box; width: calc(100% - 40px); margin: 10px 20px 20px; padding: 8px 30px 8px 10px; color: #222; background: #fff url(../images/sidebar.search.svg) right 10px center no-repeat; border: 1px solid #ddd; border-radius: 2px; }
 .sidebar-panel ul { margin: 0; padding: 0; }
 .sidebar-panel li { margin: 0; overflow: hidden; list-style: none; font-size: 12px; }
 .sidebar-panel li:hover { background: #f7f7f7; }
