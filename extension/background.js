@@ -1,6 +1,7 @@
 import {
   bootstrap,
   createDial,
+  findDialByUrl,
   getDials,
   getGroups,
   saveImage,
@@ -68,6 +69,8 @@ function refreshContextMenus() {
 
 async function addUrlToGroup({ url, title, groupId }) {
   const normalized = normalizeUrl(url);
+  const existing = await findDialByUrl(normalized);
+  if (existing) return { dial: existing, created: false };
   const dial = await createDial({
     title: title || hostname(normalized),
     url: normalized,
@@ -177,7 +180,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       ? String(info.menuItemId).slice(MENU.GROUP_PREFIX.length)
       : await defaultGroupId();
     const result = await addUrlToGroup({ url, title: tab?.title, groupId });
-    if (tab?.windowId != null) await captureCurrentDial(result.dial.id, tab.windowId);
+    if (result.created && tab?.windowId != null) await captureCurrentDial(result.dial.id, tab.windowId);
     await showActionResult(result.created ? "✓" : "•");
   })().catch(console.error);
 });

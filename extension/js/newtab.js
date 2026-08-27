@@ -18,7 +18,7 @@ import {
   updateGroup,
   visitDial,
 } from "./db.js";
-import { applySettings, getSettings, resetSettings, saveSettings } from "./settings.js";
+import { applySettings, DEFAULT_SETTINGS, getSettings, saveSettings } from "./settings.js";
 import { initSidebar } from "./sidebar.js";
 import {
   PERIOD_LABELS,
@@ -31,7 +31,6 @@ import {
   hueFor,
   initials,
   normalizeUrl,
-  requestPermission,
 } from "./utils.js";
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -43,12 +42,11 @@ const state = {
   settings: null,
   activeGroupId: null,
   query: "",
-  libraryType: "bookmarks",
-  libraryItems: [],
   objectUrls: [],
   dragDialId: null,
   dragGroupId: null,
   backgroundDraft: null,
+  settingsDraftBase: null,
   sidebarController: null,
   contextTarget: null,
 };
@@ -61,10 +59,6 @@ const elements = {
   stageEyebrow: $("#stage-eyebrow"),
   stageCount: $("#stage-count"),
   search: $("#search-input"),
-  drawer: $("#library-drawer"),
-  drawerScrim: $("#drawer-scrim"),
-  libraryList: $("#library-list"),
-  librarySearch: $("#library-search"),
   dialDialog: $("#dial-dialog"),
   dialForm: $("#dial-form"),
   groupDialog: $("#group-dialog"),
@@ -75,12 +69,34 @@ const elements = {
   toast: $("#toast"),
 };
 
+const SETTINGS_NUMBER_FIELDS = ["columns", "gap", "dialSpace", "cardRadius", "padding", "thumbnailRatio", "fontSize"];
+const SETTINGS_BOOLEAN_FIELDS = [
+  "verticalCenter", "darkTheme", "showAddButton", "showSearch", "showTitles", "showVisits",
+  "keepActiveGroup", "highlight", "alwaysNewTab", "scrollLayout", "showContextMenu",
+  "sidebarEnabled", "sidebarBookmarks", "sidebarHistory",
+];
+const SETTINGS_STRING_FIELDS = [
+  "sortMode", "shadowStyle", "titleAlign", "fontFamily", "fontStyle", "fontWeight",
+  "dialBackground", "dialBackgroundHover", "dialBorder", "dialBorderHover", "titleColor", "titleColorHover",
+  "customCss", "refreshThumbnails", "thumbnailQuality", "thumbnailFit", "backgroundColor", "backgroundUrl",
+  "backgroundRepeat", "backgroundSize", "backgroundPosition",
+];
+
 let toastTimer;
+let settingsStatusTimer;
 function toast(message) {
   elements.toast.textContent = message;
   elements.toast.classList.add("visible");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => elements.toast.classList.remove("visible"), 2400);
+}
+
+function showSettingsStatus(message, isError = false) {
+  const status = $("#settings-status");
+  status.textContent = message;
+  status.classList.toggle("error", isError);
+  clearTimeout(settingsStatusTimer);
+  settingsStatusTimer = setTimeout(() => { status.textContent = ""; }, 3000);
 }
 
 function notifyBackground() {
@@ -439,11 +455,8 @@ function openGroupEditor(group = null) {
   form.reset();
   form.elements.id.value = group?.id || "";
   form.elements.name.value = group?.name || "";
-  const alternatives = state.groups.filter((item) => item.id !== group?.id);
-  form.elements.fallbackGroupId.replaceChildren(...alternatives.map((item) => new Option(item.name, item.id)));
   $("#group-dialog-title").textContent = group ? "编辑分组" : "新建分组";
   $("#delete-group").hidden = !group || group.id === "default";
-  $("#move-dials-field").hidden = true;
   elements.groupDialog.showModal();
   setTimeout(() => form.elements.name.focus(), 30);
 }
@@ -488,124 +501,14 @@ async function openAllGroup(groupId) {
   return dials.length;
 }
 
-function openDrawer(type = state.libraryType) {
-  state.libraryType = type;
-  elements.drawer.classList.add("open");
-  elements.drawer.setAttribute("aria-hidden", "false");
-  elements.drawer.inert = false;
-  elements.drawerScrim.hidden = false;
-  loadLibrary(type).catch((error) => showLibraryError(error.message));
-}
-
-function closeDrawer() {
-  elements.drawer.classList.remove("open");
-  elements.drawer.setAttribute("aria-hidden", "true");
-  elements.drawer.inert = true;
-  elements.drawerScrim.hidden = true;
-}
-
-function showLibraryError(message) {
-  elements.libraryList.replaceChildren();
-  const note = document.createElement("div");
-  note.className = "empty-note";
-  note.textContent = message;
-  elements.libraryList.append(note);
-}
-
-function flattenBookmarks(nodes, output = []) {
-  for (const node of nodes) {
-    if (node.url) output.push({ title: node.title || hostname(node.url), url: node.url, meta: "书签" });
-    if (node.children) flattenBookmarks(node.children, output);
-  }
-  return output;
-}
-
-async function loadLibrary(type) {
-  state.libraryType = type;
-  $$("[data-library]").forEach((button) => button.classList.toggle("active", button.dataset.library === type));
-  elements.libraryList.innerHTML = '<div class="empty-note">正在读取…</div>'; 
-  let items = [];
-  if (type === "bookmarks") {
-    if (!(await requestPermission("bookmarks"))) throw new Error("未授予书签权限。");
-    items = flattenBookmarks(await chrome.bookmarks.getTree());
-  } else if (type === "history") {
-    if (!(await requestPermission("history"))) throw new Error("未授予历史记录权限。");
-    const results = await chrome.history.search({ text: "", startTime: Date.now() - 90 * 86400000, maxResults: 300 });
-    items = results.map((item) => ({ title: item.title || hostname(item.url), url: item.url, meta: `${item.visitCount || 0} visits` }));
-  } else if (type === "recent") {
-    if (!(await requestPermission("sessions"))) throw new Error("未授予最近关闭页面权限。");
-    const sessions = await chrome.sessions.getRecentlyClosed({ maxResults: 25 });
-    items = sessions.map((item) => {
-      const tab = item.tab || item.window?.tabs?.[0];
-      return { title: tab?.title || "已关闭的窗口", url: tab?.url || "", meta: "恢复", sessionId: item.tab?.sessionId || item.window?.sessionId };
-    });
-  } else {
-    if (!(await requestPermission("topSites"))) throw new Error("未授予常用网站权限。");
-    items = (await chrome.topSites.get()).map((item) => ({ title: item.title || hostname(item.url), url: item.url, meta: "常用网站" }));
-  }
-  state.libraryItems = items.filter((item) => item.sessionId || /^https?:\/\//i.test(item.url || ""));
-  renderLibrary();
-}
-
-function renderLibrary() {
-  const query = elements.librarySearch.value.trim().toLocaleLowerCase();
-  const items = state.libraryItems.filter((item) => `${item.title} ${item.url}`.toLocaleLowerCase().includes(query));
-  elements.libraryList.replaceChildren();
-  if (!items.length) return showLibraryError("这里暂时没有内容。");
-  items.slice(0, 250).forEach((item) => {
-    const row = document.createElement("button");
-    row.type = "button";
-    row.className = "library-item";
-    row.dataset.url = item.url || "";
-    row.dataset.title = item.title;
-    if (item.sessionId) row.dataset.sessionId = item.sessionId;
-
-    const icon = document.createElement(item.url ? "img" : "span");
-    if (item.url) {
-      icon.src = faviconUrl(item.url, 32);
-      icon.alt = "";
-      icon.addEventListener("error", () => {
-        const replacement = document.createElement("span");
-        replacement.className = "library-fallback";
-        replacement.textContent = initials(item.url);
-        icon.replaceWith(replacement);
-      }, { once: true });
-    } else {
-      icon.className = "library-fallback";
-      icon.textContent = "↺";
-    }
-    const copy = document.createElement("span");
-    copy.className = "library-copy";
-    const strong = document.createElement("strong");
-    strong.textContent = item.title;
-    const small = document.createElement("small");
-    small.textContent = item.url ? hostname(item.url) : item.meta;
-    copy.append(strong, small);
-    const action = document.createElement("span");
-    action.className = "library-action";
-    action.dataset.action = item.sessionId ? "restore-session" : "add-library-item";
-    action.textContent = item.sessionId ? "↺" : "+";
-    action.title = item.sessionId ? "恢复" : "添加到快速拨号";
-    row.append(icon, copy, action);
-    elements.libraryList.append(row);
-  });
-}
-
-async function addLibraryItem(row) {
-  const url = normalizeUrl(row.dataset.url);
-  await createDial({ title: row.dataset.title, url, groupId: state.activeGroupId });
-  await refreshData();
-  notifyBackground();
-  toast("已从 Chrome 添加");
-}
-
 function renderStats() {
   const totalVisits = state.dials.reduce((sum, dial) => sum + (dial.visits || 0), 0);
   const visited = state.dials.filter((dial) => dial.visits > 0).length;
   const periods = { morning: 0, afternoon: 0, evening: 0, night: 0 };
   state.dials.forEach((dial) => Object.keys(periods).forEach((key) => periods[key] += dial.visitsByPeriod?.[key] || 0));
   const maxPeriod = Math.max(1, ...Object.values(periods));
-  const top = [...state.dials].sort((a, b) => (b.visits || 0) - (a.visits || 0)).slice(0, 8);
+  const top = [...state.dials].filter((dial) => (dial.visits || 0) > 0)
+    .sort((a, b) => (b.visits || 0) - (a.visits || 0)).slice(0, 8);
   const content = $("#stats-content");
   content.replaceChildren();
 
@@ -645,37 +548,54 @@ function renderStats() {
   content.append(summary, chart, list);
 }
 
-function populateSettingsForm() {
-  const form = elements.settingsForm;
-  const settings = state.settings;
-  ["columns", "gap", "dialSpace"].forEach((name) => {
-    form.elements[name].value = settings[name];
+function selectSettingsTab(tab) {
+  $$('[data-settings-tab]', elements.settingsForm).forEach((button) => {
+    button.classList.toggle("active", button.dataset.settingsTab === tab);
   });
-  ["verticalCenter", "showAddButton", "darkTheme"].forEach((name) => {
-    form.elements[name].checked = settings[name];
+  $$('[data-settings-panel]', elements.settingsForm).forEach((panel) => {
+    panel.hidden = panel.dataset.settingsPanel !== tab;
   });
-  updateRangeOutputs();
+  elements.settingsForm.querySelector(".settings-panels").scrollTop = 0;
 }
 
-function updateRangeOutputs() {
+function updateSettingsRange(range, value = range.value) {
+  range.value = value;
+  const min = Number(range.min);
+  const max = Number(range.max);
+  const progress = max > min ? (Number(range.value) - min) / (max - min) * 100 : 0;
+  range.style.setProperty("--range-progress", `${Math.max(0, Math.min(100, progress))}%`);
+}
+
+function populateSettingsForm(settings = state.settings) {
   const form = elements.settingsForm;
-  ["columns", "gap", "dialSpace"].forEach((name) => {
-    const suffix = name === "columns" ? "" : name === "dialSpace" ? "%" : "px";
-    $(`[data-output="${name}"]`).value = `${form.elements[name].value}${suffix}`;
+  SETTINGS_NUMBER_FIELDS.forEach((name) => { form.elements[name].value = settings[name]; });
+  $$('[data-setting-range]', form).forEach((range) => {
+    updateSettingsRange(range, form.elements[range.dataset.settingRange].value);
   });
+  SETTINGS_BOOLEAN_FIELDS.forEach((name) => { form.elements[name].checked = Boolean(settings[name]); });
+  SETTINGS_STRING_FIELDS.forEach((name) => { form.elements[name].value = settings[name] ?? ""; });
+  state.backgroundDraft = settings.backgroundImage || "";
+  state.settingsDraftBase = settings;
+  $("#settings-background-file").value = "";
 }
 
 function settingsFromForm() {
   const form = elements.settingsForm;
-  return {
-    columns: Number(form.elements.columns.value),
-    gap: Number(form.elements.gap.value),
-    dialSpace: Number(form.elements.dialSpace.value),
-    verticalCenter: form.elements.verticalCenter.checked,
-    showAddButton: form.elements.showAddButton.checked,
-    darkTheme: form.elements.darkTheme.checked,
-    theme: form.elements.darkTheme.checked ? "dark" : "light",
-  };
+  const settings = {};
+  SETTINGS_NUMBER_FIELDS.forEach((name) => { settings[name] = Number(form.elements[name].value); });
+  SETTINGS_BOOLEAN_FIELDS.forEach((name) => { settings[name] = form.elements[name].checked; });
+  SETTINGS_STRING_FIELDS.forEach((name) => { settings[name] = form.elements[name].value; });
+  settings.refreshThumbnails = Number(settings.refreshThumbnails);
+  settings.backgroundImage = settings.backgroundUrl ? "" : state.backgroundDraft;
+  settings.theme = settings.darkTheme ? "dark" : "light";
+  return { ...state.settingsDraftBase, ...settings };
+}
+
+function openSettingsDialog(tab = "general") {
+  populateSettingsForm();
+  $("#settings-status").textContent = "";
+  selectSettingsTab(tab);
+  elements.settingsDialog.showModal();
 }
 
 async function saveSettingsForm(event) {
@@ -725,7 +645,7 @@ async function runContextCommand(command) {
   hideContextMenus();
   if (command === "add-dial") return openDialEditor();
   if (command === "add-group") return openGroupEditor();
-  if (command === "settings") return chrome.runtime.openOptionsPage();
+  if (command === "settings") return openSettingsDialog();
   if (command === "statistics") { location.href = chrome.runtime.getURL("statistics.html"); return; }
   if (command === "open-new-tab" && dial) return openDial(dial, { forceNewTab: true });
   if (command === "edit-dial" && dial) return openDialEditor(dial);
@@ -751,9 +671,8 @@ function bindEvents() {
     const count = await openAllGroup(state.activeGroupId);
     if (count) toast(`已打开 ${count} 个网站`);
   });
-  $("#open-library")?.addEventListener("click", () => {});
   $("#open-stats")?.addEventListener("click", () => { renderStats(); elements.statsDialog.showModal(); });
-  $("#open-settings").addEventListener("click", () => { populateSettingsForm(); elements.settingsDialog.showModal(); });
+  $("#open-settings").addEventListener("click", () => openSettingsDialog());
   $$('[data-close-dialog]').forEach((button) => button.addEventListener("click", () => button.closest("dialog").close()));
 
   elements.search.addEventListener("input", debounce(() => {
@@ -872,14 +791,105 @@ function bindEvents() {
     renderDials();
   });
 
-  elements.settingsForm.addEventListener("input", (event) => {
-    if (event.target.type === "range") updateRangeOutputs();
-    const preview = { ...state.settings, ...settingsFromForm() };
-    applySettings(preview);
+  elements.settingsForm.addEventListener("submit", (event) => {
+    saveSettingsForm(event).catch((error) => showSettingsStatus(`保存失败：${error.message}`, true));
   });
-  elements.settingsForm.addEventListener("submit", saveSettingsForm);
-  elements.settingsDialog.addEventListener("close", () => applySettings(state.settings));
-  $("#open-full-options").addEventListener("click", () => chrome.runtime.openOptionsPage());
+  elements.settingsForm.addEventListener("input", (event) => {
+    const range = event.target.closest("[data-setting-range]");
+    if (range) {
+      elements.settingsForm.elements[range.dataset.settingRange].value = range.value;
+      updateSettingsRange(range);
+      return;
+    }
+    if (event.target.type === "number" && SETTINGS_NUMBER_FIELDS.includes(event.target.name) && event.target.value !== "") {
+      const linkedRange = $(`[data-setting-range="${event.target.name}"]`, elements.settingsForm);
+      if (linkedRange) updateSettingsRange(linkedRange, event.target.value);
+    }
+  });
+  elements.settingsForm.querySelector(".settings-navigation").addEventListener("click", (event) => {
+    const tab = event.target.closest("[data-settings-tab]")?.dataset.settingsTab;
+    if (tab) selectSettingsTab(tab);
+  });
+  $("#settings-background-file").addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      event.target.value = "";
+      showSettingsStatus("请选择小于 10 MB 的背景图片", true);
+      return;
+    }
+    state.backgroundDraft = await fileToDataUrl(file);
+    elements.settingsForm.elements.backgroundUrl.value = "";
+    showSettingsStatus("已选择背景图片，保存后生效");
+  });
+  $("#settings-clear-background").addEventListener("click", () => {
+    state.backgroundDraft = "";
+    elements.settingsForm.elements.backgroundUrl.value = "";
+    $("#settings-background-file").value = "";
+    showSettingsStatus("背景图片已移除，保存后生效");
+  });
+  $("#settings-load-fonts").addEventListener("click", async (event) => {
+    if (typeof window.queryLocalFonts !== "function") {
+      showSettingsStatus("当前 Chrome 版本不支持读取系统字体，可以直接输入字体名称", true);
+      return;
+    }
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      const fonts = await window.queryLocalFonts();
+      const families = [...new Set(fonts.map((font) => font.family).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, "zh-CN"));
+      $("#settings-font-list").replaceChildren(...families.map((family) => new Option("", family)));
+      showSettingsStatus(`已读取 ${families.length} 种系统字体`);
+    } catch (error) {
+      showSettingsStatus(error.name === "NotAllowedError" ? "未获得字体读取权限，可以直接输入字体名称" : `读取字体失败：${error.message}`, true);
+    } finally {
+      button.disabled = false;
+    }
+  });
+  $("#settings-reset").addEventListener("click", () => {
+    if (!confirm("确定将所有设置恢复为默认值吗？")) return;
+    populateSettingsForm(DEFAULT_SETTINGS);
+    showSettingsStatus("默认设置已载入，保存后生效");
+  });
+  $("#settings-export-backup").addEventListener("click", async () => {
+    const backup = await exportBackup();
+    backup.settings = state.settings;
+    downloadJson(`zero-dial-${new Date().toISOString().slice(0, 10)}.json`, backup);
+    showSettingsStatus("备份已导出");
+  });
+  $("#settings-import-backup").addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    try {
+      const backup = JSON.parse(await file.text());
+      if (!confirm("导入会替换现有的分组、网站和设置。确定继续吗？")) return;
+      await importBackup(backup);
+      state.settings = backup.settings ? await saveSettings(backup.settings) : await getSettings();
+      applySettings(state.settings);
+      populateSettingsForm();
+      await refreshData({ preserveGroup: false });
+      state.sidebarController?.refresh(state.settings);
+      notifyBackground();
+      showSettingsStatus("备份已导入");
+    } catch (error) {
+      showSettingsStatus(`导入失败：${error.message}`, true);
+    } finally {
+      event.target.value = "";
+    }
+  });
+  $("#settings-export-bookmarks").addEventListener("click", async () => {
+    const response = await chrome.runtime.sendMessage({ type: "export-bookmarks" });
+    showSettingsStatus(response?.ok ? "已导出到 Chrome 书签" : response?.error || "导出失败", !response?.ok);
+  });
+  $("#settings-clear-data").addEventListener("click", async () => {
+    if (!confirm("确定清空所有分组、网站、缩略图和访问统计吗？")) return;
+    await clearAll();
+    await refreshData({ preserveGroup: false });
+    notifyBackground();
+    elements.settingsDialog.close();
+    toast("全部数据已清空");
+  });
 
   elements.dialGrid.addEventListener("dragstart", (event) => {
     const card = event.target.closest(".dial-card");
@@ -946,7 +956,8 @@ async function init() {
     isSorting: () => Boolean(state.dragDialId || state.dragGroupId),
   });
   if (location.hash === "#settings") {
-    populateSettingsForm(); elements.settingsDialog.showModal();
+    openSettingsDialog();
+    history.replaceState(null, "", location.pathname);
   }
 }
 

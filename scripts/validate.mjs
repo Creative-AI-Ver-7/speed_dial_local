@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const root = new URL("../extension/", import.meta.url);
 const manifest = JSON.parse(await readFile(new URL("manifest.json", root), "utf8"));
 const errors = [];
-const requiredFiles = ["newtab.html", "options.html", "statistics.html", "popup.html", "js/sidebar.js"];
+const requiredFiles = ["newtab.html", "statistics.html", "popup.html", "js/sidebar.js"];
 for (const file of requiredFiles) {
   try { await readFile(new URL(file, root)); }
   catch { errors.push(`required entry point is missing: ${file}`); }

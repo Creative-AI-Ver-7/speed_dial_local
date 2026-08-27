@@ -116,22 +116,35 @@ export function initSidebar({ settings, isSorting = () => false }) {
   }
 
   function sessionDetails(session) {
-    const tab = session.tab || session.window?.tabs?.[0];
+    const extensionNewTabUrl = chrome.runtime.getURL("newtab.html");
+    const tabs = session.tab ? [session.tab] : session.window?.tabs || [];
+    const tab = tabs.find((item) => item.url !== "chrome://newtab/" && item.url !== extensionNewTabUrl);
+    if (!tab) return null;
     return {
       sessionId: session.tab?.sessionId || session.window?.sessionId,
-      title: tab?.title || "已关闭的窗口",
-      url: tab?.url || "",
+      title: tab.title || "已关闭的窗口",
+      url: tab.url || "",
     };
+  }
+
+  async function getRecentlyClosedState() {
+    const stored = await chrome.storage.local.get("dismissedSessionIds");
+    const recent = (await chrome.sessions.getRecentlyClosed({ maxResults: 25 }))
+      .map(sessionDetails)
+      .filter((item) => item?.sessionId);
+    const recentIds = new Set(recent.map((item) => item.sessionId));
+    const dismissedSessionIds = (stored.dismissedSessionIds || []).filter((id) => recentIds.has(id));
+    if (dismissedSessionIds.length !== (stored.dismissedSessionIds || []).length) {
+      await chrome.storage.local.set({ dismissedSessionIds });
+    }
+    const dismissed = new Set(dismissedSessionIds);
+    return { dismissedSessionIds, sessions: recent.filter((item) => !dismissed.has(item.sessionId)) };
   }
 
   async function loadRecentlyClosed() {
     const requestId = ++historyRequestId;
     const content = document.createDocumentFragment();
-    const { dismissedSessionIds = [] } = await chrome.storage.local.get("dismissedSessionIds");
-    const dismissed = new Set(dismissedSessionIds);
-    const sessions = (await chrome.sessions.getRecentlyClosed({ maxResults: 25 }))
-      .map(sessionDetails)
-      .filter((item) => item.sessionId && !dismissed.has(item.sessionId));
+    const { sessions } = await getRecentlyClosedState();
     if (requestId !== historyRequestId) return;
 
     if (sessions.length > 1) {
@@ -150,6 +163,7 @@ export function initSidebar({ settings, isSorting = () => false }) {
       item.querySelector("a").addEventListener("click", async (event) => {
         event.preventDefault();
         await chrome.sessions.restore(session.sessionId);
+        await loadRecentlyClosed();
       });
       content.append(item);
     }
@@ -219,7 +233,7 @@ export function initSidebar({ settings, isSorting = () => false }) {
     }
     const query = bookmarkSearch.value.trim();
     if (query.length >= 3) searchBookmarks(query).catch(console.error);
-    else if (!query) loadBookmarks(bookmarkFolderId).catch(console.error);
+    else loadBookmarks(bookmarkFolderId).catch(console.error);
   });
 
   historySearch.addEventListener("keyup", (event) => {
@@ -230,19 +244,22 @@ export function initSidebar({ settings, isSorting = () => false }) {
     }
     const query = historySearch.value.trim();
     if (query.length >= 3) searchHistory(query).catch(console.error);
-    else if (!query) loadRecentlyClosed().catch(console.error);
+    else loadRecentlyClosed().catch(console.error);
   });
 
   historyList.addEventListener("click", async (event) => {
     if (event.target.closest(".restore-all")) {
-      const sessions = (await chrome.sessions.getRecentlyClosed({ maxResults: 25 })).map(sessionDetails);
+      const { sessions } = await getRecentlyClosedState();
       for (const session of sessions) {
-        if (session.sessionId) await chrome.sessions.restore(session.sessionId).catch(() => {});
+        await chrome.sessions.restore(session.sessionId).catch(() => {});
       }
+      await loadRecentlyClosed();
     }
     if (event.target.closest(".clear-sessions")) {
-      const sessions = (await chrome.sessions.getRecentlyClosed({ maxResults: 25 })).map(sessionDetails);
-      await chrome.storage.local.set({ dismissedSessionIds: sessions.map((item) => item.sessionId).filter(Boolean) });
+      const { dismissedSessionIds, sessions } = await getRecentlyClosedState();
+      await chrome.storage.local.set({
+        dismissedSessionIds: [...new Set([...dismissedSessionIds, ...sessions.map((item) => item.sessionId)])],
+      });
       await loadRecentlyClosed();
     }
   });
