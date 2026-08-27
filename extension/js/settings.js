@@ -84,12 +84,6 @@ export async function saveSettings(changes) {
   return next;
 }
 
-export async function resetSettings() {
-  const next = { ...DEFAULT_SETTINGS };
-  await chrome.storage.local.set({ [STORAGE_KEY]: next });
-  return next;
-}
-
 export function applySettings(settings, root = document.documentElement) {
   const dark = Boolean(settings.darkTheme || settings.theme === "dark");
   root.dataset.theme = dark ? "dark" : "light";

@@ -1,4 +1,4 @@
-import { bootstrap, createDial, createGroup, getGroups, saveImage, updateDial } from "./db.js";
+import { bootstrap, createDial, createGroup, findDialByUrl, getGroups, saveImage, updateDial } from "./db.js";
 import { dataUrlToBlob, hostname, normalizeUrl } from "./utils.js";
 
 const groupList = document.querySelector("#group-list");
@@ -20,9 +20,15 @@ async function saveToGroup(groupId) {
   document.querySelector(".create-list").hidden = true;
   createForm.hidden = true;
   try {
+    const url = normalizeUrl(activeTab.url);
+    if (await findDialByUrl(url)) {
+      document.querySelector("#popup-heading").textContent = "页面已在快速拨号中";
+      setTimeout(() => window.close(), 900);
+      return;
+    }
     const dial = await createDial({
       title: activeTab.title || hostname(activeTab.url),
-      url: normalizeUrl(activeTab.url),
+      url,
       groupId,
       thumbnail: { type: "default" },
     });
@@ -72,7 +78,10 @@ async function init() {
   await renderGroups();
 }
 
-document.querySelector("#open-options").addEventListener("click", () => chrome.runtime.openOptionsPage());
+document.querySelector("#open-options").addEventListener("click", async () => {
+  await chrome.tabs.create({ url: chrome.runtime.getURL("newtab.html#settings") });
+  window.close();
+});
 document.querySelector("#show-create-group").addEventListener("click", () => {
   createForm.hidden = false;
   createForm.elements.name.focus();

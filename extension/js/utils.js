@@ -94,12 +94,6 @@ export function blobToDataUrl(blob) {
   });
 }
 
-export async function requestPermission(permission) {
-  const descriptor = { permissions: [permission] };
-  if (await chrome.permissions.contains(descriptor)) return true;
-  return chrome.permissions.request(descriptor);
-}
-
 export function downloadJson(filename, value) {
   const blob = new Blob([JSON.stringify(value, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -116,14 +110,4 @@ export function debounce(fn, delay = 160) {
     clearTimeout(timeout);
     timeout = setTimeout(() => fn(...args), delay);
   };
-}
-
-export function chromeCall(fn, ...args) {
-  return new Promise((resolve, reject) => {
-    fn(...args, (result) => {
-      const error = chrome.runtime.lastError;
-      if (error) reject(new Error(error.message));
-      else resolve(result);
-    });
-  });
 }
