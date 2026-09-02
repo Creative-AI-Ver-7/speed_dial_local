@@ -101,7 +101,7 @@ body {
 .open-group-button svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; }
 
 .dial-grid { display: grid; grid-template-columns: repeat(var(--dial-columns), var(--dial-width, 320px)); gap: var(--dial-gap); align-items: start; justify-content: center; margin: 0 auto; }
-.dial-card { position: relative; width: var(--dial-width, 320px); min-width: 0; animation: card-in .16s both; }
+.dial-card { position: relative; width: var(--dial-width, 320px); min-width: 0; }
 .dial-card.dragging { z-index: 5; opacity: .7; transform: rotate(2deg); }
 .dial-card.drag-over { outline: 1px dashed #aaa; outline-offset: 6px; }
 .dial-link {
@@ -300,7 +300,6 @@ body {
 .top-row > span:first-child { color: var(--accent); }
 .top-row small { color: #999; }
 
-@keyframes card-in { from { opacity: 0; } }
 @media (max-width: 900px) {
   .topbar { padding-left: 12px; }
   .search-box { width: 34px; padding: 0 8px; }
